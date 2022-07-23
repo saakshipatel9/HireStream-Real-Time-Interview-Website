@@ -28,6 +28,7 @@ code {
   border-radius: 0 !important;
   color: rgb(51 65 85);
   background-color: none !important;
+  transition: all 0.3s ease-in-out;
 }
 
 .nav-pills .nav-link:hover{
@@ -36,4 +37,10 @@ code {
 
 .nav-item .active{
   background-color: rgb(79 70 229) !important;
+}
+
+.toast-container{
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
 }
