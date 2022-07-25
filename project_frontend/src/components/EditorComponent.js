@@ -151,7 +151,7 @@ function EditorComponent() {
         </div>
       </div>
       <div className="px-2 py-2">
-        <div className="d-flex flex-col w-100 h-100">
+        <div className="w-100">
           <CodeEditor
             code={code}
             onChange={onChange}

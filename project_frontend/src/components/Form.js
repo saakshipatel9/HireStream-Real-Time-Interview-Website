@@ -61,6 +61,7 @@ function Form() {
                 <input
                   type="text"
                   className="form-control"
+                  placeholder="Click on Generate ID"
                   onChange={(e) => setRoomId(e.target.value)}
                   value={roomId}
                   readOnly
@@ -92,6 +93,7 @@ function Form() {
                   onChange={(e) => setUserName(e.target.value)}
                   value={userName}
                   aria-describedby="emailHelp"
+                  autoComplete="off"
                 />
               </div>
               <div className="mb-3">
@@ -104,6 +106,7 @@ function Form() {
                   id="roomIdJoin"
                   onChange={(e) => setRoomIdJoin(e.target.value)}
                   value={roomIdJoin}
+                  autoComplete="off"
                 />
               </div>
 
