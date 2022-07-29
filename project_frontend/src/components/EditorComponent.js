@@ -9,11 +9,39 @@ import useKeyPress from "../hooks/useKeyPress";
 import { languageOptions } from "../constants/languageOptions";
 import InputWindow from "./InputWindow";
 import OutputDetail from "./OutputDetail";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+
+import { initSocket } from "../socket";
+import ACTIONS from "../actions/SocketActions";
 
 const javascriptDefault = `// some comment`;
 
 function EditorComponent() {
   const ref = useRef(null);
+  const socketRef = useRef(null);
+  const location = useLocation();
+  const reactNavigator = useNavigate();
+  const { roomId } = useParams();
+
+  useEffect(() => {
+    const init = async () => {
+      socketRef.current = await initSocket();
+      socketRef.current.on("connect_error", (err) => handleError(err));
+      socketRef.current.on("connect_failed", (err) => handleError(err));
+
+      function handleError(e) {
+        console.log("socket error", e);
+        //toast("socket connection failed try again later!");
+        reactNavigator("/");
+      }
+
+      socketRef.current.emit(ACTIONS.JOIN, {
+        roomId,
+        username: location.state?.userName,
+      });
+    };
+    init();
+  }, []);
 
   const [code, setCode] = useState(javascriptDefault);
   const [customInput, setCustomInput] = useState("");
