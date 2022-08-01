@@ -20,6 +20,10 @@ code {
   background-color:rgb(238, 242, 255, 0.2);
 }
 
+.homePageWrapper{
+  height: calc(100vh - 80px);
+}
+
 .tab-container{
   background-color: rgb(238 242 255);
 }
