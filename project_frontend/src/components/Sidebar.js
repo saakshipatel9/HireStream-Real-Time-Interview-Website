@@ -1,14 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Client from "../components/Client";
-import { useLocation, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
-function Sidebar() {
-  const location = useLocation();
-  const [clients, setClients] = useState([
-    { socketId: 1, userName: "Jay V" },
-    { socketId: 2, userName: "Peter P" },
-  ]);
-
+function Sidebar({ clients, location }) {
   if (!location.state) {
     return <Navigate to />;
   }
@@ -19,7 +13,7 @@ function Sidebar() {
         <p style={{ fontWeight: "bold" }}>Connected</p>
         <div className="clientList">
           {clients.map((client) => {
-            return <Client key={client.socketId} username={client.userName} />;
+            return <Client key={client.socketId} username={client.username} />;
           })}
         </div>
       </div>

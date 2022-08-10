@@ -23,26 +23,6 @@ function EditorComponent() {
   const reactNavigator = useNavigate();
   const { roomId } = useParams();
 
-  useEffect(() => {
-    const init = async () => {
-      socketRef.current = await initSocket();
-      socketRef.current.on("connect_error", (err) => handleError(err));
-      socketRef.current.on("connect_failed", (err) => handleError(err));
-
-      function handleError(e) {
-        console.log("socket error", e);
-        //toast("socket connection failed try again later!");
-        reactNavigator("/");
-      }
-
-      socketRef.current.emit(ACTIONS.JOIN, {
-        roomId,
-        username: location.state?.userName,
-      });
-    };
-    init();
-  }, []);
-
   const [code, setCode] = useState(javascriptDefault);
   const [customInput, setCustomInput] = useState("");
   const [theme, setTheme] = useState("cobalt");
