@@ -9,19 +9,11 @@ import useKeyPress from "../hooks/useKeyPress";
 import { languageOptions } from "../constants/languageOptions";
 import InputWindow from "./InputWindow";
 import OutputDetail from "./OutputDetail";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-
-import { initSocket } from "../socket";
-import ACTIONS from "../actions/SocketActions";
 
 const javascriptDefault = `// some comment`;
 
 function EditorComponent() {
   const ref = useRef(null);
-  const socketRef = useRef(null);
-  const location = useLocation();
-  const reactNavigator = useNavigate();
-  const { roomId } = useParams();
 
   const [code, setCode] = useState(javascriptDefault);
   const [customInput, setCustomInput] = useState("");

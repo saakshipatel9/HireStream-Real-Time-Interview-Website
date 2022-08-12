@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/Sidebar";
 import EditorComponent from "../components/EditorComponent";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-
 import { initSocket } from "../socket";
 import ACTIONS from "../actions/SocketActions";
 
@@ -41,8 +40,23 @@ function EditorPage() {
           setClients(clients);
         }
       );
+
+      //Listening for disconnetion event
+      socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
+        //notify user that he/she left the room
+        console.log(`${username} left the room.`);
+        setClients((prev) => {
+          return prev.filter((client) => client.socketId !== socketId);
+        });
+      });
     };
     init();
+
+    // return () => {
+    //   socketRef.current.disconnect();
+    //   socketRef.current.off(ACTIONS.JOINED);
+    //   socketRef.current.off(ACTIONS.DISCONNECTED);
+    // };
   }, []);
 
   return (
