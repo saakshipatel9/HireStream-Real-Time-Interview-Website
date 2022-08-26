@@ -36,6 +36,7 @@ function EditorComponent({ socketRef, roomId, onCodeChange }) {
   };
 
   const onChange = (action, data) => {
+    console.log(data);
     switch (action) {
       case "code": {
         setCode(data);

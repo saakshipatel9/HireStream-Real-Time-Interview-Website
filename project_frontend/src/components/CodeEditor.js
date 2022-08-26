@@ -19,6 +19,7 @@ function CodeEditor({
       roomId,
       value,
     });
+    onChange("code", value);
   };
 
   useEffect(() => {
@@ -26,7 +27,6 @@ function CodeEditor({
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ value }) => {
         if (value !== null) {
           setValue(value);
-          onChange("code", value);
           onCodeChange(value);
         }
       });
