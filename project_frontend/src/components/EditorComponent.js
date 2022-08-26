@@ -12,8 +12,9 @@ import OutputDetail from "./OutputDetail";
 
 const javascriptDefault = `// some comment`;
 
-function EditorComponent() {
+function EditorComponent({ socketRef, roomId, onCodeChange }) {
   const ref = useRef(null);
+  // const editorRef = useRef(null);
 
   const [code, setCode] = useState(javascriptDefault);
   const [customInput, setCustomInput] = useState("");
@@ -22,6 +23,13 @@ function EditorComponent() {
   const [outputDetails, setOutputDetails] = useState(null);
   const [language, setLanguage] = useState(languageOptions[0]);
   const [btnDisable, setBtnDisable] = useState(false);
+
+  // useEffect(() => {
+  //   editorRef.current = CodeEditor;
+  //   editorRef.current.on("change", (instance, changes) => {
+  //     console.log("changes", changes);
+  //   });
+  // }, []);
 
   const onSelectChange = (sl) => {
     setLanguage(sl);
@@ -157,6 +165,9 @@ function EditorComponent() {
             onChange={onChange}
             language={language?.value}
             theme={theme.value}
+            socketRef={socketRef}
+            roomId={roomId}
+            onCodeChange={onCodeChange}
           />
         </div>
         <div ref={ref} className="container-fluid h-100">

@@ -1,13 +1,42 @@
 import React, { useState } from "react";
 import Editor from "@monaco-editor/react";
+import ACTIONS from "../actions/SocketActions";
+import { useEffect, useRef } from "react";
 
-function CodeEditor({ onChange, language, code, theme }) {
-  const [value, setValue] = useState(code || "");
+function CodeEditor({
+  onChange,
+  language,
+  code,
+  theme,
+  socketRef,
+  roomId,
+  onCodeChange,
+}) {
+  const [value, setValue] = useState(code);
 
   const handleEditorChange = (value) => {
-    setValue(value);
-    onChange("code", value);
+    socketRef.current.emit(ACTIONS.CODE_CHANGE, {
+      roomId,
+      value,
+    });
   };
+
+  useEffect(() => {
+    if (socketRef.current) {
+      socketRef.current.on(ACTIONS.CODE_CHANGE, ({ value }) => {
+        if (value !== null) {
+          setValue(value);
+          onChange("code", value);
+          onCodeChange(value);
+        }
+      });
+    }
+
+    return () => {
+      socketRef.current.off(ACTIONS.CODE_CHANGE);
+    };
+  }, [socketRef.current]);
+
   return (
     <div className="">
       <Editor

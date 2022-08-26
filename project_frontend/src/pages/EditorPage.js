@@ -8,11 +8,14 @@ import ACTIONS from "../actions/SocketActions";
 function EditorPage() {
   const location = useLocation();
   const socketRef = useRef(null);
+  const codeRef = useRef(null);
   const reactNavigator = useNavigate();
   const { roomId } = useParams();
   const [clients, setClients] = useState([]);
 
   useEffect(() => {
+    console.log("Hello");
+
     const init = async () => {
       socketRef.current = await initSocket();
       socketRef.current.on("connect_error", (err) => handleError(err));
@@ -38,6 +41,12 @@ function EditorPage() {
             console.log(`${username} joined the room.`);
           }
           setClients(clients);
+
+          //sync code on first load
+          socketRef.current.emit(ACTIONS.SYNC_CODE, {
+            socketId,
+            code: codeRef.current,
+          });
         }
       );
 
@@ -52,21 +61,32 @@ function EditorPage() {
     };
     init();
 
-    // return () => {
-    //   socketRef.current.disconnect();
-    //   socketRef.current.off(ACTIONS.JOINED);
-    //   socketRef.current.off(ACTIONS.DISCONNECTED);
-    // };
-  }, []);
+    return () => {
+      socketRef.current.disconnect();
+      socketRef.current.off(ACTIONS.JOINED);
+      socketRef.current.off(ACTIONS.DISCONNECTED);
+    };
+  }, [location.state?.userName, reactNavigator, roomId]);
 
   return (
     <div className="mainWrap container-fluid mh-100 overflow-hidden">
       <div className="row">
         <div className="editor-container col-lg-9 border-3 border-end">
-          <EditorComponent />
+          <EditorComponent
+            socketRef={socketRef}
+            roomId={roomId}
+            onCodeChange={(code) => {
+              codeRef.current = code;
+              console.log("code change", code);
+            }}
+          />
         </div>
         <div className="aside min-vh-100 col-lg-3">
-          <Sidebar clients={clients} location={location} />
+          <Sidebar
+            clients={clients}
+            location={location}
+            reactNavigator={reactNavigator}
+          />
         </div>
       </div>
     </div>

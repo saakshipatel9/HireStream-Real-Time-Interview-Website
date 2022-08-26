@@ -1,6 +1,6 @@
 import React from "react";
 import Form from "../components/Form";
-import Logo from "../image-removebg-preview.png";
+import Logo from "../brand_logo.png";
 
 function Home() {
   return (

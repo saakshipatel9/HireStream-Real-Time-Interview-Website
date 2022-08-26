@@ -2,9 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import Client from "../components/Client";
 import { Navigate } from "react-router-dom";
 
-function Sidebar({ clients, location }) {
+function Sidebar({ clients, location, reactNavigator }) {
   if (!location.state) {
     return <Navigate to />;
+  }
+
+  function leaveRoom() {
+    reactNavigator("/");
   }
 
   return (
@@ -17,8 +21,10 @@ function Sidebar({ clients, location }) {
           })}
         </div>
       </div>
-      <button className="btn button copyBtn">Copy Room ID</button>
-      <button className="btn button leaveBtn">Leave</button>
+      {/* <button className="btn button copyBtn">Copy Room ID</button> */}
+      <button className="btn button leaveBtn" onClick={leaveRoom}>
+        Leave
+      </button>
     </>
   );
 }
