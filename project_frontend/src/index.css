@@ -108,3 +108,17 @@ code {
   height: 100%;
   resize: none;
 }
+
+.share_buttons{
+  margin-top:1rem;
+  padding: 0.5rem 5rem;
+  border-radius: 5px;
+  background-color: rgb(238 242 255);
+}
+
+.share_icon{
+  background-color: #FFFFFF;
+  padding: 1px 7px;
+  font-size: 1.9rem;
+  border-radius: 50px;
+}

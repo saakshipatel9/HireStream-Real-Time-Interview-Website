@@ -3,6 +3,11 @@ import { Tabs, Tab } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 import { Toast } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import {
+  EmailShareButton,
+  LinkedinShareButton,
+  WhatsappShareButton,
+} from "react-share";
 
 function Form() {
   const navigate = useNavigate();
@@ -14,6 +19,7 @@ function Form() {
   const [toastHeader, setToastHeader] = useState("");
   const [toastBody, setToastBody] = useState("");
   const [toastColor, setToastColor] = useState("");
+  const [showShare, setShare] = useState(false);
 
   const createNewRoom = (e) => {
     const id = uuidv4();
@@ -21,13 +27,20 @@ function Form() {
     console.log(id);
   };
 
-  const copyText = () => {
-    navigator.clipboard.writeText(roomId);
-    setToastHeader("Copied!");
-    setToastBody("Text is copied to clipboard.");
-    setToastColor("green");
-    setToast(true);
+  const showShareBox = (e) => {
+    setShare(true);
+    setTimeout(() => {
+      setShare(false);
+    }, 3000);
   };
+
+  // const copyText = () => {
+  //   navigator.clipboard.writeText(roomId);
+  //   setToastHeader("Copied!");
+  //   setToastBody(shareRef);
+  //   setToastColor("green");
+  //   setToast(true);
+  // };
 
   const joinRoom = (e) => {
     e.preventDefault();
@@ -70,14 +83,46 @@ function Form() {
                   className="input-group-text"
                   style={{ cursor: "pointer" }}
                   id="copyBtn"
-                  onClick={copyText}
+                  onClick={showShareBox}
                 >
-                  <i className="bi bi-files"></i>
+                  <i className="bi bi-send-fill"></i>
                 </span>
               </div>
               <button className="btn button mt-2" onClick={createNewRoom}>
                 Generate ID
               </button>
+              {showShare && (
+                <div className="share_buttons shadow-sm">
+                  <p style={{ fontWeight: "bold" }}>Share Meeting ID</p>
+                  <div className=" d-flex align-items-center justify-content-between ">
+                    <EmailShareButton
+                      subject="HireStream:Meeting Id for your upcoming Interview"
+                      body={roomId}
+                    >
+                      <i
+                        className="bi bi-envelope share_icon"
+                        style={{ color: "#EA4335" }}
+                      ></i>
+                    </EmailShareButton>
+                    <LinkedinShareButton
+                      title="HireStream:Meeting Id for your upcoming Interview"
+                      summary={roomId}
+                      source="HireStream"
+                    >
+                      <i
+                        class="bi bi-linkedin share_icon"
+                        style={{ color: "#0077b5" }}
+                      ></i>
+                    </LinkedinShareButton>
+                    <WhatsappShareButton title="HireStream:Meeting Id for your upcoming Interview">
+                      <i
+                        class="bi bi-whatsapp share_icon"
+                        style={{ color: "#25d366" }}
+                      ></i>
+                    </WhatsappShareButton>
+                  </div>
+                </div>
+              )}
             </div>
           </Tab>
           <Tab eventKey="tab-2" title="Join Room">
