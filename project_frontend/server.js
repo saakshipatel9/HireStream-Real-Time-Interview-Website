@@ -41,7 +41,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
-    console.log(code);
     io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
   });
 

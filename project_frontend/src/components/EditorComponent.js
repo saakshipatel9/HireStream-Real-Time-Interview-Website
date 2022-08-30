@@ -39,6 +39,7 @@ function EditorComponent({ socketRef, roomId, onCodeChange }) {
     console.log(data);
     switch (action) {
       case "code": {
+        console.log(data);
         setCode(data);
         break;
       }
