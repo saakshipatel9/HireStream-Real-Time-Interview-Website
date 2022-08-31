@@ -7,8 +7,14 @@ import {
   EmailShareButton,
   LinkedinShareButton,
   WhatsappShareButton,
+  FacebookShareButton,
 } from "react-share";
-
+import {
+  EmailIcon,
+  LinkedinIcon,
+  WhatsappIcon,
+  FacebookIcon,
+} from "react-share";
 function Form() {
   const navigate = useNavigate();
 
@@ -31,7 +37,7 @@ function Form() {
     setShare(true);
     setTimeout(() => {
       setShare(false);
-    }, 3000);
+    }, 8000);
   };
 
   // const copyText = () => {
@@ -99,26 +105,21 @@ function Form() {
                       subject="HireStream:Meeting Id for your upcoming Interview"
                       body={roomId}
                     >
-                      <i
+                      {/* <i
                         className="bi bi-envelope share_icon"
                         style={{ color: "#EA4335" }}
-                      ></i>
+                      ></i> */}
+                      <EmailIcon size={42} round={true} />
                     </EmailShareButton>
                     <LinkedinShareButton
                       title="HireStream:Meeting Id for your upcoming Interview"
                       summary={roomId}
                       source="HireStream"
                     >
-                      <i
-                        class="bi bi-linkedin share_icon"
-                        style={{ color: "#0077b5" }}
-                      ></i>
+                      <LinkedinIcon size={42} round={true} />
                     </LinkedinShareButton>
                     <WhatsappShareButton title="HireStream:Meeting Id for your upcoming Interview">
-                      <i
-                        class="bi bi-whatsapp share_icon"
-                        style={{ color: "#25d366" }}
-                      ></i>
+                      <WhatsappIcon size={42} round={true} />
                     </WhatsappShareButton>
                   </div>
                 </div>
