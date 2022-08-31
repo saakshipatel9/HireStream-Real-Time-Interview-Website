@@ -4,6 +4,7 @@ import EditorComponent from "../components/EditorComponent";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { initSocket } from "../socket";
 import ACTIONS from "../actions/SocketActions";
+import ReactDOM from "react-dom";
 
 function EditorPage() {
   const location = useLocation();
