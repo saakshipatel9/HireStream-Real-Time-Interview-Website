@@ -13,6 +13,7 @@ function EditorPage() {
   const reactNavigator = useNavigate();
   const { roomId } = useParams();
   const [clients, setClients] = useState([]);
+  const [joined, setJoined] = useState(false);
 
   useEffect(() => {
     console.log("Hello");
@@ -42,6 +43,8 @@ function EditorPage() {
             console.log(`${username} joined the room.`);
           }
           setClients(clients);
+          setJoined(true);
+          socketRef.current.emit("start_call", roomId);
 
           //sync code on first load
           socketRef.current.emit(ACTIONS.SYNC_CODE, {
@@ -87,6 +90,7 @@ function EditorPage() {
             clients={clients}
             location={location}
             reactNavigator={reactNavigator}
+            joined={joined}
           />
         </div>
       </div>
