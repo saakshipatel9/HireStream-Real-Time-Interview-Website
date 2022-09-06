@@ -7,7 +7,7 @@ function CodeEditor({ language, theme, value, handleEditorChange }) {
       <Editor
         height="85vh"
         width={`100%`}
-        language={language || "javascript"}
+        language={language}
         value={value}
         theme={theme}
         onChange={handleEditorChange}

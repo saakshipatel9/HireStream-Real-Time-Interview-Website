@@ -12,6 +12,14 @@ import { languageOptions } from "../constants/languageOptions";
 const javascriptDefault = `// some comment`;
 
 function EditorPage() {
+  const clearCacheData = () => {
+    caches.keys().then((names) => {
+      names.forEach((name) => {
+        caches.delete(name);
+      });
+    });
+  };
+
   const location = useLocation();
   const socketRef = useRef(null);
   const codeRef = useRef(null);
@@ -99,6 +107,7 @@ function EditorPage() {
       socketRef.current.on(ACTIONS.CODING_LANGUAGE_CHANGE, ({ sl }) => {
         console.log("sl", sl);
         setLanguage(sl);
+        console.log(language);
       });
 
       //Listening for disconnetion event
@@ -109,6 +118,10 @@ function EditorPage() {
           return prev.filter((client) => client.socketId !== socketId);
         });
       });
+
+      defineThemes("oceanic-next").then((_) =>
+        setTheme({ value: "oceanic-next", label: "Oceanic Next" })
+      );
     };
     init();
 
@@ -126,7 +139,7 @@ function EditorPage() {
 
   const [code, setCode] = useState(javascriptDefault);
   const [customInput, setCustomInput] = useState("");
-  const [theme, setTheme] = useState("cobalt");
+  const [theme, setTheme] = useState("oceanic-next");
   const [processing, setProcessing] = useState(null);
   const [outputDetails, setOutputDetails] = useState(null);
   const [language, setLanguage] = useState(languageOptions[0]);
@@ -241,12 +254,6 @@ function EditorPage() {
       defineThemes(theme.value).then((_) => setTheme(theme));
     }
   }
-
-  useEffect(() => {
-    defineThemes("oceanic-next").then((_) =>
-      setTheme({ value: "oceanic-next", label: "Oceanic Next" })
-    );
-  }, []);
 
   //Code Editor component of EditorComponent
   const [value, setValue] = useState(code);

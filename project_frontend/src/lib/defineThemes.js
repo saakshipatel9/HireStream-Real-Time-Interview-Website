@@ -1,4 +1,3 @@
-import React from "react";
 import { loader } from "@monaco-editor/react";
 
 const monacoThemes = {
