@@ -3,7 +3,7 @@ import Avatar from "react-avatar";
 
 function Client({ username }) {
   return (
-    <div className="client">
+    <div className="client" id={username}>
       <Avatar name={username} size={150} round="14px" />
       <span className="userName">{username}</span>
     </div>

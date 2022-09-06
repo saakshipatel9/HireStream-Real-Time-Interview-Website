@@ -36,6 +36,11 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on(ACTIONS.CODING_LANGUAGE_CHANGE, ({ roomId, sl }) => {
+    console.log("coding language changed");
+    socket.in(roomId).emit(ACTIONS.CODING_LANGUAGE_CHANGE, { sl });
+  });
+
   //For video conferencing
   socket.on("start_call", (roomId) => {
     console.log(`Broadcasting start_call event to peers in room ${roomId}`);
@@ -60,8 +65,9 @@ io.on("connection", (socket) => {
     socket.broadcast.to(event.roomId).emit("webrtc_ice_candidate", event);
   });
 
-  socket.on(ACTIONS.CODE_CHANGE, ({ roomId, value }) => {
+  socket.on(ACTIONS.CODE_CHANGE, ({ roomId, value, username }) => {
     socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { value });
+    io.to(roomId).emit(ACTIONS.UPDATE_WRITER, { username });
   });
 
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {

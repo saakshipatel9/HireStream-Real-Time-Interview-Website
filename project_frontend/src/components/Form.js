@@ -40,17 +40,25 @@ function Form() {
     }, 8000);
   };
 
-  // const copyText = () => {
-  //   navigator.clipboard.writeText(roomId);
-  //   setToastHeader("Copied!");
-  //   setToastBody(shareRef);
-  //   setToastColor("green");
-  //   setToast(true);
-  // };
+  const copyText = () => {
+    navigator.clipboard.writeText(roomId);
+    setToastHeader("Copied!");
+    setToastBody("Room Id is copied to clipboard");
+    setToastColor("green");
+    setToast(true);
+  };
 
   const joinRoom = (e) => {
     e.preventDefault();
     if (!roomIdJoin || !userName) {
+      setToastHeader("Warning!");
+      setToastBody("Room ID and Name is required.");
+      setToastColor("red");
+      setToast(true);
+      return;
+    }
+
+    if (typeof roomIdJoin !== "string" && roomIdJoin.trim().length() === 0) {
       setToastHeader("Warning!");
       setToastBody("Room ID and Name is required.");
       setToastColor("red");
@@ -101,6 +109,19 @@ function Form() {
                 <div className="share_buttons shadow-sm">
                   <p style={{ fontWeight: "bold" }}>Share Meeting ID</p>
                   <div className=" d-flex align-items-center justify-content-between ">
+                    <button
+                      className="btn button"
+                      style={{ borderRadius: "50px" }}
+                      onClick={copyText}
+                    >
+                      <i
+                        className="bi bi-files"
+                        style={{
+                          fontWeight: "bold",
+                          fontSize: "22px",
+                        }}
+                      ></i>
+                    </button>
                     <EmailShareButton
                       subject="HireStream:Meeting Id for your upcoming Interview"
                       body={roomId}
@@ -111,7 +132,7 @@ function Form() {
                       ></i> */}
                       <EmailIcon size={42} round={true} />
                     </EmailShareButton>
-                    <LinkedinShareButton
+                    {/* <LinkedinShareButton
                       title="HireStream:Meeting Id for your upcoming Interview"
                       summary={roomId}
                       source="HireStream"
@@ -120,7 +141,7 @@ function Form() {
                     </LinkedinShareButton>
                     <WhatsappShareButton title="HireStream:Meeting Id for your upcoming Interview">
                       <WhatsappIcon size={42} round={true} />
-                    </WhatsappShareButton>
+                    </WhatsappShareButton> */}
                   </div>
                 </div>
               )}

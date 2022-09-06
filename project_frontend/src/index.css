@@ -123,12 +123,21 @@ code {
   border-radius: 50px;
 }
 
+.video-chat-container{
+  display: none;
+}
+
 .video-position{
   width: 100%;
-  display: none;
 }
 
 .video-container{
   width: 300px;
   border-radius: 10px;
+}
+
+.writing{
+  border: 3px solid rgb(252 165 165);
+  border-radius: 10px;
+
 }
