@@ -24,6 +24,10 @@ io.on("connection", (socket) => {
   console.log("socket connected", socket.id);
   socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
     userSocketMap[socket.id] = username;
+    let isRoomCreator = false;
+    if (Object.keys(userSocketMap).length === 1) {
+      isRoomCreator = true;
+    }
     socket.join(roomId);
     socket.emit(ACTIONS.NAVIGATE_USER);
     const clients = getAllConnectedClients(roomId);
@@ -32,6 +36,7 @@ io.on("connection", (socket) => {
         clients,
         username,
         socketId: socket.id,
+        isRoomCreator,
       });
     });
   });
@@ -41,10 +46,12 @@ io.on("connection", (socket) => {
   });
 
   //For video conferencing
-  socket.on("start_call", (roomId) => {
+  socket.on("start_call", ({ roomId, username }) => {
     console.log(`Broadcasting start_call event to peers in room ${roomId}`);
-    socket.broadcast.to(roomId).emit("start_call");
+    // io.to(roomId).emit("start_call", { username });
+    io.to(roomId).emit("start_call", { username });
   });
+
   socket.on("webrtc_offer", (event) => {
     console.log(
       `Broadcasting webrtc_offer event to peers in room ${event.roomId}`
@@ -65,7 +72,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, value, username }) => {
-    socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { value });
+    io.to(roomId).emit(ACTIONS.CODE_CHANGE, { value });
     io.to(roomId).emit(ACTIONS.UPDATE_WRITER, { username });
   });
 

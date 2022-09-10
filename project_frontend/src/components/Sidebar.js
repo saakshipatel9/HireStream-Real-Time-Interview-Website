@@ -10,6 +10,10 @@ function Sidebar({
   isRoomCreator,
   roomId,
   iceServers,
+  mic,
+  video,
+  manageMic,
+  manageVideo,
 }) {
   if (!location.state) {
     return <Navigate to />;
@@ -22,11 +26,19 @@ function Sidebar({
     <>
       <div className="asideInner">
         <div className="video_options m-2">
-          <button className="btn button">
-            <i className="bi bi-mic-fill"></i>
+          <button className="btn button" onClick={manageMic}>
+            {mic ? (
+              <i className="bi bi-mic-fill"></i>
+            ) : (
+              <i className="bi bi-mic-mute-fill"></i>
+            )}
           </button>
-          <button className="btn button ms-2">
-            <i className="bi bi-camera-video-fill"></i>
+          <button className="btn button ms-2" onClick={manageVideo}>
+            {video ? (
+              <i className="bi bi-camera-video-fill"></i>
+            ) : (
+              <i className="bi bi-camera-video-off-fill"></i>
+            )}
           </button>
         </div>
         <p style={{ fontWeight: "bold" }}>Connected</p>
@@ -44,7 +56,13 @@ function Sidebar({
         </div>
         <div className="clientList">
           {clients.map((client) => {
-            return <Client key={client.socketId} username={client.username} />;
+            return (
+              <Client
+                key={client.socketId}
+                username={client.username}
+                video={video}
+              />
+            );
           })}
         </div>
       </div>
