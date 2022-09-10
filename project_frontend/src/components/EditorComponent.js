@@ -25,12 +25,21 @@ function EditorComponent({
   outputDetails,
   customInput,
   setCustomInput,
+  selectedOption,
 }) {
+  const [themeCode, setThemeCode] = useState("");
+  useEffect(() => {
+    // console.log("________________", theme);
+    setThemeCode(theme?.value);
+  }, [theme]);
   return (
     <div className="">
       <div className="d-flex flex-row">
         <div className="px-2 py-2">
-          <LanguageDropDown onSelectChange={onSelectChange} />
+          <LanguageDropDown
+            onSelectChange={onSelectChange}
+            selectedOption={selectedOption}
+          />
         </div>
         <div className="px-2 py-2">
           <ThemeDropDown handleThemeChange={handleThemeChange} theme={theme} />
@@ -52,7 +61,7 @@ function EditorComponent({
         <div className="w-100">
           <CodeEditor
             language={language?.value}
-            theme={theme.value}
+            theme={themeCode}
             value={value}
             handleEditorChange={handleEditorChange}
           />

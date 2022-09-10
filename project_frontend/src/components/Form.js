@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Tabs, Tab } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 import { Toast } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+
 import {
   EmailShareButton,
   LinkedinShareButton,
@@ -16,8 +17,7 @@ import {
   FacebookIcon,
 } from "react-share";
 function Form() {
-  const navigate = useNavigate();
-
+  const reactNavigator = useNavigate();
   const [roomId, setRoomId] = useState("");
   const [userName, setUserName] = useState("");
   const [roomIdJoin, setRoomIdJoin] = useState("");
@@ -66,8 +66,9 @@ function Form() {
       return;
     }
 
-    navigate(`/editor/${roomIdJoin}`, {
+    reactNavigator(`editor/${roomIdJoin}`, {
       state: {
+        roomIdJoin,
         userName,
       },
     });
@@ -177,7 +178,7 @@ function Form() {
                 />
               </div>
 
-              <button type="submit" className="btn button" onClick={joinRoom}>
+              <button type="" className="btn button" onClick={joinRoom}>
                 Join
               </button>
             </form>

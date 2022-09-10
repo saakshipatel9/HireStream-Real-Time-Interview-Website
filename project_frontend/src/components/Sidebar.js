@@ -6,7 +6,6 @@ function Sidebar({
   clients,
   location,
   reactNavigator,
-  joined,
   socketRef,
   isRoomCreator,
   roomId,

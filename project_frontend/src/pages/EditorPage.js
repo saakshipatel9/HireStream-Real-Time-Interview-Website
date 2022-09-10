@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import Sidebar from "../components/Sidebar";
 import EditorComponent from "../components/EditorComponent";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -8,6 +8,7 @@ import ReactDOM from "react-dom";
 import axios from "axios";
 import { defineThemes } from "../lib/defineThemes";
 import { languageOptions } from "../constants/languageOptions";
+import Modal from "react-bootstrap/Modal";
 
 const javascriptDefault = `// some comment`;
 
@@ -20,15 +21,27 @@ function EditorPage() {
     });
   };
 
+  const navigate = useNavigate();
+
   const location = useLocation();
   const socketRef = useRef(null);
   const codeRef = useRef(null);
   const reactNavigator = useNavigate();
   const { roomId } = useParams();
   const [clients, setClients] = useState([]);
-  const [joined, setJoined] = useState(false);
+  const [code, setCode] = useState(javascriptDefault);
+  const [customInput, setCustomInput] = useState("");
+  const [theme, setTheme] = useState("oceanic-next");
+  const [processing, setProcessing] = useState(null);
+  const [outputDetails, setOutputDetails] = useState(null);
+  const [language, setLanguage] = useState(languageOptions[0]);
+  const [btnDisable, setBtnDisable] = useState(false);
+  const [value, setValue] = useState(code);
+  const [selectedOption, setSelectedOption] = useState(languageOptions[0]);
+  const [userJoinMsg, setUserJoinMsg] = useState("");
+  const [isShow, setIsShow] = useState(false);
+  const [fUser, setFUser] = useState("");
   let isRoomCreator;
-  let rtcPeerConnection;
 
   const iceServers = {
     iceServers: [
@@ -41,15 +54,13 @@ function EditorPage() {
   };
 
   useEffect(() => {
-    console.log("Hello");
-
     const init = async () => {
       socketRef.current = await initSocket();
       socketRef.current.on("connect_error", (err) => handleError(err));
       socketRef.current.on("connect_failed", (err) => handleError(err));
       function handleError(e) {
         console.log("socket error", e);
-        //toast("socket connection failed try again later!");
+        // toast("socket connection failed try again later!");
         reactNavigator("/");
       }
 
@@ -57,6 +68,14 @@ function EditorPage() {
         roomId,
         username: location.state?.userName,
       });
+
+      //admin allowing user to join
+      // socketRef.current.on(ACTIONS.USER_JOIN_PERMISSION, ({ username }) => {
+      //   const msg = `${username} wants to join the meeting`;
+      //   setUserJoinMsg(msg);
+      //   setIsShow(true);
+      //   setFUser(username);
+      // });
 
       //Listening for join event
       socketRef.current.on(
@@ -67,15 +86,13 @@ function EditorPage() {
             console.log(`${username} joined the room.`);
           }
           setClients(clients);
-          setJoined(true);
-          isRoomCreator = true;
-          socketRef.current.emit("start_call", roomId);
+          // socketRef.current.emit("start_call", roomId);
 
           //sync code on first load
-          socketRef.current.emit(ACTIONS.SYNC_CODE, {
-            socketId,
-            code: codeRef.current,
-          });
+          // socketRef.current.emit(ACTIONS.SYNC_CODE, {
+          //   socketId,
+          //   code: codeRef.current,
+          // });
         }
       );
 
@@ -105,9 +122,8 @@ function EditorPage() {
       });
 
       socketRef.current.on(ACTIONS.CODING_LANGUAGE_CHANGE, ({ sl }) => {
-        console.log("sl", sl);
+        setSelectedOption(sl);
         setLanguage(sl);
-        console.log(language);
       });
 
       //Listening for disconnetion event
@@ -131,19 +147,7 @@ function EditorPage() {
       socketRef.current.off(ACTIONS.DISCONNECTED);
       socketRef.current.off(ACTIONS.CODE_CHANGE);
     };
-  }, [location.state?.userName, reactNavigator, roomId]);
-
-  //EditorComponent---------------------
-  const ref = useRef(null);
-  // const editorRef = useRef(null);
-
-  const [code, setCode] = useState(javascriptDefault);
-  const [customInput, setCustomInput] = useState("");
-  const [theme, setTheme] = useState("oceanic-next");
-  const [processing, setProcessing] = useState(null);
-  const [outputDetails, setOutputDetails] = useState(null);
-  const [language, setLanguage] = useState(languageOptions[0]);
-  const [btnDisable, setBtnDisable] = useState(false);
+  }, []);
 
   // useEffect(() => {
   //   editorRef.current = CodeEditor;
@@ -152,9 +156,19 @@ function EditorPage() {
   //   });
   // }, []);
 
+  const joinUser = () => {
+    socketRef.current.emit(ACTIONS.JOIN_USER, { roomId, username: fUser });
+    setIsShow(false);
+  };
+
   const onSelectChange = (sl) => {
     setLanguage(sl);
-    socketRef.current.emit(ACTIONS.CODING_LANGUAGE_CHANGE, { roomId, sl });
+    setSelectedOption(sl);
+    console.log(sl);
+    socketRef.current.emit(ACTIONS.CODING_LANGUAGE_CHANGE, {
+      roomId,
+      sl,
+    });
   };
 
   const onChange = (action, data) => {
@@ -255,9 +269,6 @@ function EditorPage() {
     }
   }
 
-  //Code Editor component of EditorComponent
-  const [value, setValue] = useState(code);
-
   const handleEditorChange = (value) => {
     setValue(value);
     onChange("code", value);
@@ -290,6 +301,7 @@ function EditorPage() {
             outputDetails={outputDetails}
             customInput={customInput}
             setCustomInput={setCustomInput}
+            selectedOption={selectedOption}
           />
         </div>
         <div className="aside min-vh-100 col-lg-3">
@@ -297,7 +309,6 @@ function EditorPage() {
             clients={clients}
             location={location}
             reactNavigator={reactNavigator}
-            joined={joined}
             socketRef={socketRef}
             isRoomCreator={isRoomCreator}
             roomId={roomId}
@@ -305,6 +316,19 @@ function EditorPage() {
           />
         </div>
       </div>
+
+      <Modal show={isShow}>
+        <Modal.Header>
+          <h3>User join permission</h3>
+        </Modal.Header>
+        <Modal.Body>{userJoinMsg}</Modal.Body>
+        <Modal.Footer>
+          <button className="btn button mt-2" onClick={joinUser}>
+            Allow
+          </button>
+          <button className="btn button mt-2">Dismiss</button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

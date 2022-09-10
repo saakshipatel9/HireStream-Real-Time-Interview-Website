@@ -8,6 +8,7 @@ const server = http.createServer(app); //created server
 const io = new Server(server); //created instance of Server class
 
 const userSocketMap = {};
+let firstUser;
 
 function getAllConnectedClients(roomId) {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
@@ -22,10 +23,10 @@ function getAllConnectedClients(roomId) {
 
 io.on("connection", (socket) => {
   console.log("socket connected", socket.id);
-
   socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
     userSocketMap[socket.id] = username;
     socket.join(roomId);
+    socket.emit(ACTIONS.NAVIGATE_USER);
     const clients = getAllConnectedClients(roomId);
     clients.forEach(({ socketId }) => {
       io.to(socketId).emit(ACTIONS.JOINED, {
@@ -36,8 +37,9 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on(ACTIONS.JOIN_USER, ({ roomId, username }) => {});
+
   socket.on(ACTIONS.CODING_LANGUAGE_CHANGE, ({ roomId, sl }) => {
-    console.log("coding language changed");
     socket.in(roomId).emit(ACTIONS.CODING_LANGUAGE_CHANGE, { sl });
   });
 
