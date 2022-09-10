@@ -8,7 +8,6 @@ const server = http.createServer(app); //created server
 const io = new Server(server); //created instance of Server class
 
 const userSocketMap = {};
-let firstUser;
 
 function getAllConnectedClients(roomId) {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
@@ -36,8 +35,6 @@ io.on("connection", (socket) => {
       });
     });
   });
-
-  socket.on(ACTIONS.JOIN_USER, ({ roomId, username }) => {});
 
   socket.on(ACTIONS.CODING_LANGUAGE_CHANGE, ({ roomId, sl }) => {
     socket.in(roomId).emit(ACTIONS.CODING_LANGUAGE_CHANGE, { sl });

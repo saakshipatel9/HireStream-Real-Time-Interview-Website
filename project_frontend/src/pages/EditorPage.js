@@ -41,6 +41,7 @@ function EditorPage() {
   const [userJoinMsg, setUserJoinMsg] = useState("");
   const [isShow, setIsShow] = useState(false);
   const [fUser, setFUser] = useState("");
+
   let isRoomCreator;
 
   const iceServers = {
@@ -86,13 +87,13 @@ function EditorPage() {
             console.log(`${username} joined the room.`);
           }
           setClients(clients);
-          // socketRef.current.emit("start_call", roomId);
+          socketRef.current.emit("start_call", roomId);
 
-          //sync code on first load
-          // socketRef.current.emit(ACTIONS.SYNC_CODE, {
-          //   socketId,
-          //   code: codeRef.current,
-          // });
+          // sync code on first load
+          socketRef.current.emit(ACTIONS.SYNC_CODE, {
+            socketId,
+            code: codeRef.current,
+          });
         }
       );
 

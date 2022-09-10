@@ -10,8 +10,8 @@ function Waiting() {
   const roomId = location.state?.roomIdJoin;
   const userName = location.state?.userName;
   const [test, setTest] = useState();
-  const socketRef = useRef(null);
   const [navigate, setNavigate] = useState(false);
+  const socketRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -38,7 +38,7 @@ function Waiting() {
 
   useEffect(() => {
     setNavigate(true);
-  },[socketRef]);
+  }, [socketRef]);
 
   return (
     <>
