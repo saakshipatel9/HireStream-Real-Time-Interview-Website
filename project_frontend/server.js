@@ -80,6 +80,12 @@ io.on("connection", (socket) => {
     io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
   });
 
+  //Whiteboard
+  socket.on("drawing", ({ data }) => {
+    console.log("broadcasting data for drawing", data);
+    socket.broadcast.emit("drawing", { data });
+  });
+
   socket.on("disconnecting", () => {
     const rooms = [...socket.rooms];
     rooms.forEach((roomId) => {

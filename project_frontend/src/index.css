@@ -90,6 +90,7 @@ code {
 .editor-container{
   height: 100vh !important;
   overflow-y: scroll;
+  position: relative;
 }
 
 .output-container{
@@ -141,3 +142,36 @@ code {
   border-radius: 10px;
 
 }
+
+.board{
+  box-sizing: border-box;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.whiteboard {
+  height: 85vh;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 50px;
+}
+
+.colors {
+  position: fixed;
+}
+
+.color {
+  display: inline-block;
+  height: 48px;
+  width: 48px;
+}
+
+.color.black { background-color: black; }
+.color.red { background-color: red; }
+.color.green { background-color: green; }
+.color.blue { background-color: blue; }
+.color.yellow { background-color: yellow; }

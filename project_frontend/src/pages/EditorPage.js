@@ -9,7 +9,8 @@ import axios from "axios";
 import { defineThemes } from "../lib/defineThemes";
 import { languageOptions } from "../constants/languageOptions";
 import Modal from "react-bootstrap/Modal";
-import { Peer } from "peerjs";
+import { Tabs, Tab } from "react-bootstrap";
+import Board from "../components/Board";
 
 const javascriptDefault = `// some comment`;
 
@@ -44,7 +45,7 @@ function EditorPage() {
   const [fUser, setFUser] = useState("");
   const [mic, setMic] = useState(false);
   const [video, setVideo] = useState(false);
-  const [peerId, setPeerId] = useState(null);
+
   const mediaConstraints = {
     audio: true,
     video: true,
@@ -187,6 +188,10 @@ function EditorPage() {
         setLanguage(sl);
       });
 
+      socketRef.current.on("drawing", ({ data }) => {
+        onDrawingEvent(data);
+      });
+
       //Listening for disconnetion event
       socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
         //notify user that he/she left the room
@@ -208,33 +213,6 @@ function EditorPage() {
       socketRef.current.off(ACTIONS.DISCONNECTED);
       socketRef.current.off(ACTIONS.CODE_CHANGE);
     };
-  }, []);
-
-  useEffect(() => {
-    let peer = new Peer();
-    // {
-    //   host: "localhost:",
-    //   path: "/peerjs/myapp",
-    // }
-    peer.on("open", (id) => {
-      console.log("My peer ID is: " + id);
-    });
-    peer.on("error", (error) => {
-      console.error(error);
-    });
-
-    // Handle incoming voice/video connection
-    peer.on("call", (call) => {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          call.answer(stream); // Answer the call with an A/V stream.
-          call.on("stream", renderVideo);
-        })
-        .catch((err) => {
-          console.error("Failed to get local stream", err);
-        });
-    });
   }, []);
 
   // useEffect(() => {
@@ -457,29 +435,166 @@ function EditorPage() {
     }
   }
 
+  //WhiteBoard
+  var canvas;
+  var colors;
+  var context;
+  var current = {
+    color: "black",
+  };
+  var drawing = false;
+  useEffect(() => {
+    canvas = document.getElementsByClassName("whiteboard")[0];
+    colors = document.getElementsByClassName("color");
+    context = canvas.getContext("2d");
+
+    canvas.addEventListener("mousedown", onMouseDown, false);
+    canvas.addEventListener("mouseup", onMouseUp, false);
+    canvas.addEventListener("mouseout", onMouseUp, false);
+    canvas.addEventListener("mousemove", throttle(onMouseMove, 10), false);
+
+    //Touch support for mobile devices
+    canvas.addEventListener("touchstart", onMouseDown, false);
+    canvas.addEventListener("touchend", onMouseUp, false);
+    canvas.addEventListener("touchcancel", onMouseUp, false);
+    canvas.addEventListener("touchmove", throttle(onMouseMove, 10), false);
+
+    for (var i = 0; i < colors.length; i++) {
+      colors[i].addEventListener("click", onColorUpdate, false);
+    }
+
+    window.addEventListener("resize", onResize, false);
+    onResize();
+  }, []);
+
+  function drawLine(x0, y0, x1, y1, color, emit) {
+    context.beginPath();
+    context.moveTo(x0, y0);
+    context.lineTo(x1, y1);
+    context.strokeStyle = color;
+    context.lineWidth = 2;
+    context.stroke();
+    context.closePath();
+
+    if (!emit) {
+      return;
+    }
+    var w = canvas.width;
+    var h = canvas.height;
+    socketRef.current.emit("drawing", {
+      data: {
+        x0: x0 / w,
+        y0: y0 / h,
+        x1: x1 / w,
+        y1: y1 / h,
+        color: color,
+      },
+    });
+  }
+
+  function onMouseDown(e) {
+    drawing = true;
+    current.x = e.clientX || e.touches[0].clientX;
+    current.y = e.clientY || e.touches[0].clientY;
+  }
+
+  function onMouseUp(e) {
+    if (!drawing) {
+      return;
+    }
+    drawing = false;
+    drawLine(
+      current.x,
+      current.y,
+      e.clientX || e.touches[0].clientX,
+      e.clientY || e.touches[0].clientY,
+      current.color,
+      true
+    );
+  }
+
+  function onMouseMove(e) {
+    if (!drawing) {
+      return;
+    }
+    drawLine(
+      current.x,
+      current.y,
+      e.clientX || e.touches[0].clientX,
+      e.clientY || e.touches[0].clientY,
+      current.color,
+      true
+    );
+    current.x = e.clientX || e.touches[0].clientX;
+    current.y = e.clientY || e.touches[0].clientY;
+  }
+
+  function onColorUpdate(e) {
+    current.color = e.target.className.split(" ")[1];
+  }
+
+  // limit the number of events per second
+  function throttle(callback, delay) {
+    var previousCall = new Date().getTime();
+    return function () {
+      var time = new Date().getTime();
+
+      if (time - previousCall >= delay) {
+        previousCall = time;
+        callback.apply(null, arguments);
+      }
+    };
+  }
+
+  // make the canvas fill its parent
+  function onResize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function onDrawingEvent(data) {
+    var w = canvas.width;
+    var h = canvas.height;
+    drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
+  }
+
   return (
     <div className="mainWrap container-fluid mh-100 overflow-hidden">
       <div className="row">
         <div className="editor-container col-lg-9 border-3 border-end">
-          <EditorComponent
-            socketRef={socketRef}
-            roomId={roomId}
-            value={value}
-            handleEditorChange={handleEditorChange}
-            onSelectChange={onSelectChange}
-            handleThemeChange={handleThemeChange}
-            handleCompile={handleCompile}
-            btnDisable={btnDisable}
-            processing={processing}
-            code={code}
-            onChange={onChange}
-            language={language}
-            theme={theme}
-            outputDetails={outputDetails}
-            customInput={customInput}
-            setCustomInput={setCustomInput}
-            selectedOption={selectedOption}
-          />
+          <Tabs
+            justify
+            variant="pills"
+            defaultActiveKey="tab-1"
+            className="tab-container mb-1 p-0 border-bottom"
+          >
+            <Tab eventKey="tab-1" title="Code Editor">
+              <EditorComponent
+                socketRef={socketRef}
+                roomId={roomId}
+                value={value}
+                handleEditorChange={handleEditorChange}
+                onSelectChange={onSelectChange}
+                handleThemeChange={handleThemeChange}
+                handleCompile={handleCompile}
+                btnDisable={btnDisable}
+                processing={processing}
+                code={code}
+                onChange={onChange}
+                language={language}
+                theme={theme}
+                outputDetails={outputDetails}
+                customInput={customInput}
+                setCustomInput={setCustomInput}
+                selectedOption={selectedOption}
+              />
+            </Tab>
+            <Tab eventKey="tab-2" title="WhiteBoard">
+              <div>
+                <Board />
+              </div>
+            </Tab>
+          </Tabs>
         </div>
         <div className="aside min-vh-100 col-lg-3">
           <Sidebar
