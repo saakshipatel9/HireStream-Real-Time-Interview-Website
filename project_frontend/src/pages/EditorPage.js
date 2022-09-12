@@ -119,7 +119,7 @@ function EditorPage() {
         // let id = `video-${username}`;
         // remoteVideoComponent = document.getElementById(id);
         let id = `video-${username}`;
-        localVideoComponent = document.getElementById(id);
+        remoteVideoComponent = document.getElementById(id);
         addLocalTracks(rtcPeerConnection);
         rtcPeerConnection.ontrack = setRemoteStream;
         rtcPeerConnection.onicecandidate = sendIceCandidate;
@@ -347,7 +347,6 @@ function EditorPage() {
   };
 
   async function setLocalStream(mediaConstraints) {
-    let stream;
     try {
       await navigator.mediaDevices
         .getUserMedia(mediaConstraints)
@@ -360,7 +359,6 @@ function EditorPage() {
     }
 
     console.log("set local stream", localVideoComponent);
-    return stream;
   }
 
   const manageVideo = async () => {
@@ -368,6 +366,8 @@ function EditorPage() {
       setVideo(true);
       let id = `video-${location.state?.userName}`;
       localVideoComponent = document.getElementById(id);
+      localVideoComponent.style.visibility = "visible";
+      setLocalStream(mediaConstraints);
       // await setLocalStream(mediaConstraints);
       socketRef.current.emit("start_call", {
         roomId,
@@ -375,12 +375,17 @@ function EditorPage() {
       });
     } else {
       setVideo(false);
+      let id = `video-${location.state?.userName}`;
+      localVideoComponent = document.getElementById(id);
+      navigator.mediaDevices.getUserMedia(mediaConstraints).then((stream) => {
+        localVideoComponent.srcObject = stream;
+        stream.getTracks().forEach((track) => track.stop());
+      });
     }
   };
 
   function addLocalTracks(rtcPeerConnection) {
     navigator.mediaDevices.getUserMedia(mediaConstraints).then((stream) => {
-      localVideoComponent.srcObject = stream;
       stream
         .getTracks()
         .forEach((track) => rtcPeerConnection.addTrack(track, stream));

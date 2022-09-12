@@ -10,12 +10,13 @@ function Client({ username, video }) {
         id={id}
         width="300px"
         autoPlay={true}
-        style={{ borderRadius: "10px" }}
+        style={{ borderRadius: "10px", visibility: "hidden" }}
         muted
       ></video>
-      {/* ) : (
-        <Avatar name={username} size={150} round="14px" />
-      )} */}
+      {/* ) : ( */}
+      {video ? null : <Avatar name={username} size={150} round="14px" />}
+
+      {/* )} */}
       <span className="userName">{username}</span>
     </div>
   );

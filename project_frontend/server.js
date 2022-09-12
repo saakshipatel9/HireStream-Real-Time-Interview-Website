@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
   socket.on("start_call", ({ roomId, username }) => {
     console.log(`Broadcasting start_call event to peers in room ${roomId}`);
     // io.to(roomId).emit("start_call", { username });
-    io.to(roomId).emit("start_call", { username });
+    socket.broadcast.to(roomId).emit("start_call", { username });
   });
 
   socket.on("webrtc_offer", (event) => {
@@ -82,7 +82,7 @@ io.on("connection", (socket) => {
 
   //Whiteboard
   socket.on("drawing", ({ data }) => {
-    console.log("broadcasting data for drawing", data);
+    // console.log("broadcasting data for drawing", data);
     socket.broadcast.emit("drawing", { data });
   });
 
