@@ -9,8 +9,7 @@ export const initSocket = async () => {
   };
 
   return io(
-    `https://hirestream.herokuapp.com:${process.env.PORT || 5000}` ||
-      process.env.REACT_APP_BACKEND_URL,
+    "https://hirestream.herokuapp.com",
     options
   );
 };
