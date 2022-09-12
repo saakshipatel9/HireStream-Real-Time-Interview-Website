@@ -1,6 +1,10 @@
 import { io } from "socket.io-client";
 
 export const initSocket = async () => {
+  // window.location.origin.replace(/^https/, "ws");
+
+  var HOST = window.location.origin.replace(/^https/, "ws");
+  console.log("HOST", HOST);
   const options = {
     "force new connection": true,
     reconnectionAttempt: "Infinity",
@@ -8,5 +12,5 @@ export const initSocket = async () => {
     transports: ["websocket"],
   };
 
-  return io(process.env.PORT, options);
+  return io(HOST, options);
 };
