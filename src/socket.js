@@ -8,5 +8,9 @@ export const initSocket = async () => {
     transports: ["websocket"],
   };
 
-  return io(process.env.PORT || "http://localhost:5000", options);
+  return io(
+    `https://hirestream.herokuapp.com:${process.env.PORT || 5000}` ||
+      process.env.REACT_APP_BACKEND_URL,
+    options
+  );
 };
