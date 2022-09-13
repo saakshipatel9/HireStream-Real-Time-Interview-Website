@@ -1,11 +1,17 @@
 const express = require("express");
 const app = express();
 const http = require("http");
+const path = require("path");
 const { Server } = require("socket.io"); //made class named Server
 const ACTIONS = require("./src/actions/SocketActions");
 
 const server = http.createServer(app); //created server
 const io = new Server(server); //created instance of Server class
+
+app.use(express.static("build"));
+app.use((req, res, next) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 const userSocketMap = {};
 
