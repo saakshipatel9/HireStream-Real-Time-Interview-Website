@@ -10,7 +10,7 @@ const ACTIONS = {
   CODING_LANGUAGE_CHANGE: "coding_language_change",
   UPDATE_WRITER: "update_writer",
   USER_JOIN_PERMISSION: "user_join_permission",
-  NAVIGATE_USER: "navigate_user",
+  NAVIGATE_USER: "navigate_use",
 };
 
 module.exports = ACTIONS;
