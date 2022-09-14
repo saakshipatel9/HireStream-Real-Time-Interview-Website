@@ -10,7 +10,7 @@ function Client({ username, video }) {
         id={id}
         width="300px"
         autoPlay={true}
-        style={{ borderRadius: "10px", visibility: "hidden" }}
+        style={{ borderRadius: "10px" }}
         muted
       ></video>
       {/* ) : ( */}

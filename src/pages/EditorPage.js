@@ -60,6 +60,16 @@ function EditorPage() {
     videoContainer.srcObject = stream;
   };
   let rtcPeerConnection;
+  let isInitiator;
+  if (location.state?.userName === "Jay") {
+    isInitiator = true;
+  } else {
+    isInitiator = false;
+  }
+
+  let id = `video-${location.state?.userName}`;
+  localVideoComponent = document.getElementById(id);
+  console.log(localVideoComponent);
 
   const iceServers = {
     iceServers: [
@@ -98,12 +108,18 @@ function EditorPage() {
       //Listening for join event
       socketRef.current.on(
         ACTIONS.JOINED,
-        ({ clients, username, socketId, isRoomCreator }) => {
+        async ({ clients, username, socketId, isRoomCreator }) => {
           if (username !== location.state?.userName) {
             //Notify all users using toast notification
             console.log(`${username} joined the room.`);
           }
           setClients(clients);
+          setVideo(true);
+          await setLocalStream(mediaConstraints);
+          socketRef.current.emit("start_call", {
+            roomId,
+            username: location.state?.userName,
+          });
 
           // sync code on first load
           socketRef.current.emit(ACTIONS.SYNC_CODE, {
@@ -113,30 +129,31 @@ function EditorPage() {
         }
       );
 
-      socketRef.current.on("start_call", async ({ username }) => {
-        rtcPeerConnection = new RTCPeerConnection(iceServers);
-        // addLocalTracks(rtcPeerConnection);
-        // let id = `video-${username}`;
-        // remoteVideoComponent = document.getElementById(id);
+      socketRef.current.on("start_call", async ({ username, uLocalStream }) => {
         let id = `video-${username}`;
         remoteVideoComponent = document.getElementById(id);
-        addLocalTracks(rtcPeerConnection);
-        rtcPeerConnection.ontrack = setRemoteStream;
-        rtcPeerConnection.onicecandidate = sendIceCandidate;
-        await createOffer(rtcPeerConnection);
+        if (isInitiator) {
+          rtcPeerConnection = new RTCPeerConnection(iceServers);
+          console.log(rtcPeerConnection);
+          addLocalTracks(rtcPeerConnection);
+          rtcPeerConnection.ontrack = setRemoteStream;
+          rtcPeerConnection.onicecandidate = sendIceCandidate;
+          await createOffer(rtcPeerConnection);
+        }
       });
 
       socketRef.current.on("webrtc_offer", async (event) => {
-        console.log("Socket event callback: webrtc_offer");
-
-        rtcPeerConnection = new RTCPeerConnection(iceServers);
-        addLocalTracks(rtcPeerConnection);
-        rtcPeerConnection.ontrack = setRemoteStream;
-        rtcPeerConnection.onicecandidate = sendIceCandidate;
-        rtcPeerConnection.setRemoteDescription(
-          new RTCSessionDescription(event)
-        );
-        await createAnswer(rtcPeerConnection);
+        if (!isInitiator) {
+          console.log("Socket event callback: webrtc_offer");
+          rtcPeerConnection = new RTCPeerConnection(iceServers);
+          addLocalTracks(rtcPeerConnection);
+          rtcPeerConnection.ontrack = setRemoteStream;
+          rtcPeerConnection.onicecandidate = sendIceCandidate;
+          rtcPeerConnection.setRemoteDescription(
+            new RTCSessionDescription(event)
+          );
+          await createAnswer(rtcPeerConnection);
+        }
       });
 
       socketRef.current.on("webrtc_answer", (event) => {
@@ -351,6 +368,8 @@ function EditorPage() {
       await navigator.mediaDevices
         .getUserMedia(mediaConstraints)
         .then((stream) => {
+          let id = `video-${location.state?.userName}`;
+          localVideoComponent = document.getElementById(id);
           localVideoComponent.srcObject = stream;
           localStream = stream;
         });
@@ -367,8 +386,8 @@ function EditorPage() {
       let id = `video-${location.state?.userName}`;
       localVideoComponent = document.getElementById(id);
       localVideoComponent.style.visibility = "visible";
-      setLocalStream(mediaConstraints);
-      // await setLocalStream(mediaConstraints);
+      await setLocalStream(mediaConstraints);
+      // addLocalTracks(rtcPeerConnection);
       socketRef.current.emit("start_call", {
         roomId,
         username: location.state?.userName,
@@ -385,15 +404,14 @@ function EditorPage() {
   };
 
   function addLocalTracks(rtcPeerConnection) {
-    navigator.mediaDevices.getUserMedia(mediaConstraints).then((stream) => {
-      stream
-        .getTracks()
-        .forEach((track) => rtcPeerConnection.addTrack(track, stream));
-    });
+    console.log("Local stream", localStream);
+    localStream
+      .getTracks()
+      .forEach((track) => rtcPeerConnection.addTrack(track, localStream));
   }
 
   function setRemoteStream(event) {
-    console.log(event.streams);
+    console.log("event stream", event.streams[0]);
     remoteVideoComponent.srcObject = event.streams[0];
     remoteStream = event.stream;
   }
@@ -431,6 +449,7 @@ function EditorPage() {
   }
 
   function sendIceCandidate(event) {
+    console.log(event.candidate);
     if (event.candidate) {
       socketRef.current.emit("webrtc_ice_candidate", {
         roomId,

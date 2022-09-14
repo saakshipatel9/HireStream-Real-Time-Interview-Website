@@ -52,10 +52,12 @@ io.on("connection", (socket) => {
   });
 
   //For video conferencing
-  socket.on("start_call", ({ roomId, username }) => {
+  socket.on("start_call", ({ roomId, username, localStream }) => {
     console.log(`Broadcasting start_call event to peers in room ${roomId}`);
     // io.to(roomId).emit("start_call", { username });
-    socket.broadcast.to(roomId).emit("start_call", { username });
+    socket.broadcast
+      .to(roomId)
+      .emit("start_call", { username, uLocalStream: localStream });
   });
 
   socket.on("webrtc_offer", (event) => {
