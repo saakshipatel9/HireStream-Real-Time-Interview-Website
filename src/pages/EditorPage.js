@@ -51,7 +51,7 @@ function EditorPage() {
     video: true,
   };
 
-  let localStream;
+  let localStream = new MediaStream();
   let remoteStream;
   let localVideoComponent;
   let remoteVideoComponent;
@@ -134,7 +134,6 @@ function EditorPage() {
         remoteVideoComponent = document.getElementById(id);
         if (isInitiator) {
           rtcPeerConnection = new RTCPeerConnection(iceServers);
-          console.log(rtcPeerConnection);
           addLocalTracks(rtcPeerConnection);
           rtcPeerConnection.ontrack = setRemoteStream;
           rtcPeerConnection.onicecandidate = sendIceCandidate;
@@ -143,8 +142,8 @@ function EditorPage() {
       });
 
       socketRef.current.on("webrtc_offer", async (event) => {
+        console.log("Socket event callback: webrtc_offer");
         if (!isInitiator) {
-          console.log("Socket event callback: webrtc_offer");
           rtcPeerConnection = new RTCPeerConnection(iceServers);
           addLocalTracks(rtcPeerConnection);
           rtcPeerConnection.ontrack = setRemoteStream;
@@ -153,6 +152,7 @@ function EditorPage() {
             new RTCSessionDescription(event)
           );
           await createAnswer(rtcPeerConnection);
+          isInitiator = true;
         }
       });
 
@@ -207,6 +207,11 @@ function EditorPage() {
 
       socketRef.current.on("drawing", ({ data }) => {
         onDrawingEvent(data);
+      });
+
+      socketRef.current.on("undoRedo", ({ trackObj }) => {
+        console.log(trackObj);
+        activateUndoRedo(trackObj);
       });
 
       //Listening for disconnetion event
@@ -388,10 +393,12 @@ function EditorPage() {
       localVideoComponent.style.visibility = "visible";
       await setLocalStream(mediaConstraints);
       // addLocalTracks(rtcPeerConnection);
-      socketRef.current.emit("start_call", {
-        roomId,
-        username: location.state?.userName,
-      });
+      // setVideo(true);
+      await setLocalStream(mediaConstraints);
+      // socketRef.current.emit("start_call", {
+      //   roomId,
+      //   username: location.state?.userName,
+      // });
     } else {
       setVideo(false);
       let id = `video-${location.state?.userName}`;
@@ -467,10 +474,19 @@ function EditorPage() {
     color: "black",
   };
   var drawing = false;
+  var eraser;
+  var undo;
+  var redo;
+
+  let undoRedoTracker = []; // data
+  let track = 0;
   useEffect(() => {
     canvas = document.getElementsByClassName("whiteboard")[0];
     colors = document.getElementsByClassName("color");
     context = canvas.getContext("2d");
+    eraser = document.getElementsByClassName("eraser");
+    undo = document.getElementsByClassName("undo");
+    redo = document.getElementsByClassName("redo");
 
     canvas.addEventListener("mousedown", onMouseDown, false);
     canvas.addEventListener("mouseup", onMouseUp, false);
@@ -487,6 +503,10 @@ function EditorPage() {
       colors[i].addEventListener("click", onColorUpdate, false);
     }
 
+    eraser[0].addEventListener("click", activeEraser, false);
+    undo[0].addEventListener("click", activeUndo, false);
+    redo[0].addEventListener("click", activeRedo, false);
+
     window.addEventListener("resize", onResize, false);
     onResize();
   }, []);
@@ -496,7 +516,11 @@ function EditorPage() {
     context.moveTo(x0, y0);
     context.lineTo(x1, y1);
     context.strokeStyle = color;
-    context.lineWidth = 2;
+    if (color === "white") {
+      context.lineWidth = 10;
+    } else {
+      context.lineWidth = 5;
+    }
     context.stroke();
     context.closePath();
 
@@ -527,11 +551,15 @@ function EditorPage() {
       return;
     }
     drawing = false;
+    let url = canvas.toDataURL();
+    undoRedoTracker.push(url);
+    track = undoRedoTracker.length - 1;
+    console.log("track", track);
     drawLine(
       current.x,
       current.y,
-      e.clientX || e.touches[0].clientX,
-      e.clientY || e.touches[0].clientY,
+      e.clientX || e.changedTouches[0].clientX,
+      e.clientY || e.changedTouches[0].clientY,
       current.color,
       true
     );
@@ -582,6 +610,53 @@ function EditorPage() {
     drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
   }
 
+  function activeEraser(e) {
+    canvas.style.cursor = "pointer";
+    current.color = "white";
+  }
+
+  function activeUndo(e) {
+    console.log("activate undo");
+    if (track > 0) {
+      track = track - 1;
+    }
+
+    let trackObj = {
+      trackValue: track,
+      undoRedoTracker: undoRedoTracker,
+    };
+
+    socketRef.current.emit("undoRedo", { roomId, trackObj });
+  }
+
+  function activeRedo(e) {
+    console.log("active Redo");
+    if (track < undoRedoTracker.length - 1) {
+      track++;
+    }
+
+    let trackObj = {
+      trackValue: track,
+      undoRedoTracker: undoRedoTracker,
+    };
+
+    socketRef.current.emit("undoRedo", { roomId, trackObj });
+  }
+
+  function activateUndoRedo(trackObj) {
+    track = trackObj.trackValue;
+    undoRedoTracker = trackObj.undoRedoTracker;
+
+    let url = undoRedoTracker[track];
+
+    let img = new Image();
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    img.src = url;
+    img.onload = (e) => {
+      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+  }
+
   return (
     <div className="mainWrap container-fluid mh-100 overflow-hidden">
       <div className="row">
@@ -615,7 +690,11 @@ function EditorPage() {
             </Tab>
             <Tab eventKey="tab-2" title="WhiteBoard">
               <div>
-                <Board />
+                <Board
+                  activeEraser={activeEraser}
+                  activeUndo={activeUndo}
+                  activeRedo={activeRedo}
+                />
               </div>
             </Tab>
           </Tabs>

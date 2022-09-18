@@ -80,7 +80,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, value, username }) => {
-    io.to(roomId).emit(ACTIONS.CODE_CHANGE, { value });
+    socket.broadcast.to(roomId).emit(ACTIONS.CODE_CHANGE, { value });
     io.to(roomId).emit(ACTIONS.UPDATE_WRITER, { username });
   });
 
@@ -92,6 +92,10 @@ io.on("connection", (socket) => {
   socket.on("drawing", ({ data }) => {
     // console.log("broadcasting data for drawing", data);
     socket.broadcast.emit("drawing", { data });
+  });
+
+  socket.on("undoRedo", ({ roomId, trackObj }) => {
+    io.to(roomId).emit("undoRedo", { trackObj });
   });
 
   socket.on("disconnecting", () => {

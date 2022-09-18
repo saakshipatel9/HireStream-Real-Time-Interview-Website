@@ -11,7 +11,6 @@ function Client({ username, video }) {
         width="300px"
         autoPlay={true}
         style={{ borderRadius: "10px" }}
-        muted
       ></video>
       {/* ) : ( */}
       {video ? null : <Avatar name={username} size={150} round="14px" />}

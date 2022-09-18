@@ -12,6 +12,18 @@ function Board() {
         <div className="color blue"></div>
         <div className="color yellow"></div>
       </div>
+
+      <div className="controls">
+        <div className="control eraser">
+          <i className="bi bi-eraser-fill"></i>
+        </div>
+        <div className="control undo">
+          <i className="bi bi-arrow-counterclockwise"></i>
+        </div>
+        <div className="control redo">
+          <i className="bi bi-arrow-clockwise"></i>
+        </div>
+      </div>
     </div>
   );
 }
