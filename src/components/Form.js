@@ -133,7 +133,7 @@ function Form() {
                       ></i> */}
                       <EmailIcon size={42} round={true} />
                     </EmailShareButton>
-                    {/* <LinkedinShareButton
+                    <LinkedinShareButton
                       title="HireStream:Meeting Id for your upcoming Interview"
                       summary={roomId}
                       source="HireStream"
@@ -142,7 +142,7 @@ function Form() {
                     </LinkedinShareButton>
                     <WhatsappShareButton title="HireStream:Meeting Id for your upcoming Interview">
                       <WhatsappIcon size={42} round={true} />
-                    </WhatsappShareButton> */}
+                    </WhatsappShareButton>
                   </div>
                 </div>
               )}
