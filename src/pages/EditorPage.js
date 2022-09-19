@@ -478,7 +478,7 @@ function EditorPage() {
   var undo;
   var redo;
 
-  let undoRedoTracker = []; // data
+  let undoRedoTracker = [];
   let track = 0;
   useEffect(() => {
     canvas = document.getElementsByClassName("whiteboard")[0];
@@ -617,7 +617,7 @@ function EditorPage() {
 
   function activeUndo(e) {
     console.log("activate undo");
-    if (track > 0) {
+    if (track > -1) {
       track = track - 1;
     }
 
@@ -646,7 +646,7 @@ function EditorPage() {
   function activateUndoRedo(trackObj) {
     track = trackObj.trackValue;
     undoRedoTracker = trackObj.undoRedoTracker;
-
+    console.log(undoRedoTracker);
     let url = undoRedoTracker[track];
 
     let img = new Image();
