@@ -33,13 +33,13 @@ function Sidebar({
               <i className="bi bi-mic-mute-fill"></i>
             )}
           </button>
-          <button className="btn button ms-2" onClick={manageVideo}>
+          {/* <button className="btn button ms-2" onClick={manageVideo}>
             {video ? (
               <i className="bi bi-camera-video-fill"></i>
             ) : (
               <i className="bi bi-camera-video-off-fill"></i>
             )}
-          </button>
+          </button> */}
         </div>
         <p style={{ fontWeight: "bold" }}>Connected</p>
         <div id="video-chat-container" className="video-position">

@@ -114,7 +114,7 @@ function EditorPage() {
             console.log(`${username} joined the room.`);
           }
           setClients(clients);
-          setVideo(true);
+          // setVideo(true);
           await setLocalStream(mediaConstraints);
           socketRef.current.emit("start_call", {
             roomId,
