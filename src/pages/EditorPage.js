@@ -152,7 +152,6 @@ function EditorPage() {
             new RTCSessionDescription(event)
           );
           await createAnswer(rtcPeerConnection);
-          isInitiator = true;
         }
       });
 
