@@ -80,7 +80,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, value, username }) => {
-    io.to(roomId).emit(ACTIONS.CODE_CHANGE, { value });
+    socket.broadcast.to(roomId).emit(ACTIONS.CODE_CHANGE, { value });
+    // io.to(roomId).emit(ACTIONS.CODE_CHANGE, { value });
     io.to(roomId).emit(ACTIONS.UPDATE_WRITER, { username });
   });
 
