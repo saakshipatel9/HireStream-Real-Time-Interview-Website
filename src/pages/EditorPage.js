@@ -709,6 +709,8 @@ function EditorPage() {
             mic={mic}
             video={video}
             manageVideo={manageVideo}
+            localStream={localStream}
+            mediaConstraints={mediaConstraints}
           />
         </div>
       </div>

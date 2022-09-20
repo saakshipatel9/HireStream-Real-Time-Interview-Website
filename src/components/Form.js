@@ -125,7 +125,8 @@ function Form() {
                     </button>
                     <EmailShareButton
                       subject="HireStream:Meeting Id for your upcoming Interview"
-                      body={roomId}
+                      body={"Meeting id:" + roomId.trim()}
+                      seperator=" "
                     >
                       {/* <i
                         className="bi bi-envelope share_icon"

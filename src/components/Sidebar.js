@@ -14,12 +14,20 @@ function Sidebar({
   video,
   manageMic,
   manageVideo,
+  localStream,
+  mediaConstraints,
 }) {
   if (!location.state) {
     return <Navigate to />;
   }
 
   function leaveRoom() {
+    let id = `video-${location.state?.userName}`;
+    let localVideoComponent = document.getElementById(id);
+    const mediaStream = localVideoComponent.srcObject;
+    const tracks = mediaStream.getTracks();
+    tracks[0].stop();
+    tracks.forEach((track) => track.stop());
     reactNavigator("/");
   }
   return (

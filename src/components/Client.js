@@ -13,7 +13,7 @@ function Client({ username, video }) {
         style={{ borderRadius: "10px" }}
       ></video>
       {/* ) : ( */}
-      {video ? null : <Avatar name={username} size={150} round="14px" />}
+      {/* {video ? null : <Avatar name={username} size={150} round="14px" />} */}
 
       {/* )} */}
       <span className="userName">{username}</span>
