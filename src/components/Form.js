@@ -26,11 +26,48 @@ function Form() {
   const [toastBody, setToastBody] = useState("");
   const [toastColor, setToastColor] = useState("");
   const [showShare, setShare] = useState(false);
+  const [email, setEmail] = useState("");
+  const [joinEmail, setJoinEmail] = useState("");
+  const [isInitiator, setIsInitiator] = useState(false);
 
-  const createNewRoom = (e) => {
+  const GenerateId = (e) => {
     const id = uuidv4();
     setRoomId(id);
     console.log(id);
+  };
+
+  const CreateRoom = async (e) => {
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "/createRoom",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            roomId: roomId,
+            roomCreator: email,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      setToastHeader("Create Room");
+      setToastBody("Room is created!");
+      setToastColor("green");
+      setToast(true);
+
+      console.log("result is: ", result);
+    } catch (err) {
+      console.log(err.message);
+    }
   };
 
   const showShareBox = (e) => {
@@ -48,11 +85,57 @@ function Form() {
     setToast(true);
   };
 
+  const checkIsInitiator = async (JoinRoomId, email) => {
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + `/checkCreator/${JoinRoomId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result[0].roomCreator === email) {
+        reactNavigator(`editor/${roomIdJoin}`, {
+          state: {
+            roomIdJoin,
+            userName,
+            isInitiator: true,
+          },
+        });
+      } else {
+        reactNavigator(`editor/${roomIdJoin}`, {
+          state: {
+            roomIdJoin,
+            userName,
+            isInitiator: false,
+          },
+        });
+      }
+    } catch (err) {
+      console.log(err.message);
+      setToastHeader("Warning!");
+      setToastBody("This room id is neither create by you or any other user.");
+      setToastColor("red");
+      setToast(true);
+      return;
+    }
+  };
+
   const joinRoom = (e) => {
     e.preventDefault();
-    if (!roomIdJoin || !userName) {
+    if (!roomIdJoin || !userName || !joinEmail) {
       setToastHeader("Warning!");
-      setToastBody("Room ID and Name is required.");
+      setToastBody("Room ID, Email and Name is required.");
       setToastColor("red");
       setToast(true);
       return;
@@ -60,18 +143,13 @@ function Form() {
 
     if (typeof roomIdJoin !== "string" && roomIdJoin.trim().length() === 0) {
       setToastHeader("Warning!");
-      setToastBody("Room ID and Name is required.");
+      setToastBody("Room ID, Email and Name is required.");
       setToastColor("red");
       setToast(true);
       return;
     }
 
-    reactNavigator(`editor/${roomIdJoin}`, {
-      state: {
-        roomIdJoin,
-        userName,
-      },
-    });
+    checkIsInitiator(roomIdJoin, joinEmail);
   };
 
   return (
@@ -86,6 +164,15 @@ function Form() {
           <Tab eventKey="tab-1" title="Create Room">
             <div className="p-2">
               <div className="input-group">
+                <input
+                  type="email"
+                  className="form-control"
+                  placeholder="Insert email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                />
+              </div>
+              <div className="input-group mt-2">
                 <input
                   type="text"
                   className="form-control"
@@ -103,9 +190,14 @@ function Form() {
                   <i className="bi bi-send-fill"></i>
                 </span>
               </div>
-              <button className="btn button mt-2" onClick={createNewRoom}>
-                Generate ID
-              </button>
+              <div className="d-flex align-items-center d-flex justify-content-between">
+                <button className="btn button mt-2" onClick={GenerateId}>
+                  Generate ID
+                </button>
+                <button className="btn button mt-2" onClick={CreateRoom}>
+                  Create Room
+                </button>
+              </div>
               {showShare && (
                 <div className="share_buttons shadow-sm">
                   <p style={{ fontWeight: "bold" }}>Share Meeting ID</p>
@@ -161,6 +253,20 @@ function Form() {
                   id="name"
                   onChange={(e) => setUserName(e.target.value)}
                   value={userName}
+                  aria-describedby="emailHelp"
+                  autoComplete="off"
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="name" className="form-label">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="email"
+                  onChange={(e) => setJoinEmail(e.target.value)}
+                  value={joinEmail}
                   aria-describedby="emailHelp"
                   autoComplete="off"
                 />

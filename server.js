@@ -1,4 +1,5 @@
 const express = require("express");
+var mongoose = require("mongoose");
 const app = express();
 const http = require("http");
 const path = require("path");
@@ -7,6 +8,54 @@ const ACTIONS = require("./src/actions/SocketActions");
 
 const server = http.createServer(app); //created server
 const io = new Server(server); //created instance of Server class
+
+const cors = require("cors");
+const corsOptions = {
+  origin: "*",
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+
+var bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+mongoose.Promise = global.Promise;
+mongoose.connect(
+  "mongodb+srv://jay:NX1NHJ6Cw2Y6UKOd@cluster0.hgdr883.mongodb.net/?retryWrites=true&w=majority"
+);
+
+//schema
+var roomCreatorSchema = new mongoose.Schema({
+  roomId: String,
+  roomCreator: String,
+});
+
+var RoomCreator = mongoose.model("RoomCreator", roomCreatorSchema);
+
+app.post("/createRoom", (req, res) => {
+  var data = new RoomCreator(req.body);
+  data
+    .save()
+    .then((item) => {
+      res.status(200).send(item);
+    })
+    .catch((err) => {
+      res.status(400).send("unable to save to database", err);
+    });
+});
+
+app.get("/checkCreator/:roomId", (req, res) => {
+  RoomCreator.find({ roomId: req.params.roomId })
+    .then((item) => {
+      res.status(200).send(item);
+    })
+    .catch((err) => {
+      res.status(400).send("unable to find the data", err);
+    });
+});
 
 app.use(express.static("build"));
 app.use((req, res, next) => {

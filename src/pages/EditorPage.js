@@ -60,13 +60,7 @@ function EditorPage() {
     videoContainer.srcObject = stream;
   };
   let rtcPeerConnection;
-  let isInitiator;
-  if (location.state?.userName === "Jay") {
-    isInitiator = true;
-  } else {
-    isInitiator = false;
-  }
-
+  let isInitiator = location.state?.isInitiator;
   let id = `video-${location.state?.userName}`;
   localVideoComponent = document.getElementById(id);
 
