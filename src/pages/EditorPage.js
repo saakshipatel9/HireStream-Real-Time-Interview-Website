@@ -406,6 +406,7 @@ function EditorPage() {
   function setRemoteStream(event) {
     remoteVideoComponent.srcObject = event.streams[0];
     remoteStream = event.stream;
+    console.log(remoteVideoComponent.srcObject);
   }
 
   async function createOffer(rtcPeerConnection) {
