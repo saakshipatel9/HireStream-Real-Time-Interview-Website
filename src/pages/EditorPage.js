@@ -131,6 +131,7 @@ function EditorPage() {
       socketRef.current.on("start_call", async ({ username, uLocalStream }) => {
         let id = `video-${username}`;
         remoteVideoComponent = document.getElementById(id);
+        console.log(remoteVideoComponent);
         if (isInitiator) {
           rtcPeerConnection = new RTCPeerConnection(iceServers);
           addLocalTracks(rtcPeerConnection);
