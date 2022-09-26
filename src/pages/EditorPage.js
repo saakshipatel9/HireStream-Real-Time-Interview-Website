@@ -134,9 +134,9 @@ function EditorPage() {
         console.log(remoteVideoComponent);
         if (isInitiator) {
           rtcPeerConnection = new RTCPeerConnection(iceServers);
+          rtcPeerConnection.onicecandidate = sendIceCandidate;
           addLocalTracks(rtcPeerConnection);
           rtcPeerConnection.ontrack = setRemoteStream;
-          rtcPeerConnection.onicecandidate = sendIceCandidate;
           await createOffer(rtcPeerConnection);
         }
       });
@@ -144,9 +144,9 @@ function EditorPage() {
       socketRef.current.on("webrtc_offer", async (event) => {
         if (!isInitiator) {
           rtcPeerConnection = new RTCPeerConnection(iceServers);
+          rtcPeerConnection.onicecandidate = sendIceCandidate;
           addLocalTracks(rtcPeerConnection);
           rtcPeerConnection.ontrack = setRemoteStream;
-          rtcPeerConnection.onicecandidate = sendIceCandidate;
           rtcPeerConnection.setRemoteDescription(
             new RTCSessionDescription(event)
           );
