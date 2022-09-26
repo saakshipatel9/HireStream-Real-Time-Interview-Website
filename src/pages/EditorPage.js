@@ -69,7 +69,6 @@ function EditorPage() {
 
   let id = `video-${location.state?.userName}`;
   localVideoComponent = document.getElementById(id);
-  console.log(localVideoComponent);
 
   const iceServers = {
     iceServers: [
@@ -142,7 +141,6 @@ function EditorPage() {
       });
 
       socketRef.current.on("webrtc_offer", async (event) => {
-        console.log("Socket event callback: webrtc_offer");
         if (!isInitiator) {
           rtcPeerConnection = new RTCPeerConnection(iceServers);
           addLocalTracks(rtcPeerConnection);
@@ -156,16 +154,12 @@ function EditorPage() {
       });
 
       socketRef.current.on("webrtc_answer", (event) => {
-        console.log("Socket event callback: webrtc_answer");
-
         rtcPeerConnection.setRemoteDescription(
           new RTCSessionDescription(event)
         );
       });
 
       socketRef.current.on("webrtc_ice_candidate", (event) => {
-        console.log("Socket event callback: webrtc_ice_candidate");
-
         // ICE candidate configuration.
         var candidate = new RTCIceCandidate({
           sdpMLineIndex: event.label,
@@ -209,7 +203,6 @@ function EditorPage() {
       });
 
       socketRef.current.on("undoRedo", ({ trackObj }) => {
-        console.log(trackObj);
         activateUndoRedo(trackObj);
       });
 
@@ -251,7 +244,6 @@ function EditorPage() {
   const onSelectChange = (sl) => {
     setLanguage(sl);
     setSelectedOption(sl);
-    console.log(sl);
     socketRef.current.emit(ACTIONS.CODING_LANGUAGE_CHANGE, {
       roomId,
       sl,
@@ -271,7 +263,6 @@ function EditorPage() {
   };
 
   const handleCompile = () => {
-    console.log(code);
     setBtnDisable(true);
     setProcessing(true);
     const formData = {
@@ -280,7 +271,6 @@ function EditorPage() {
       source_code: btoa(code),
       stdin: btoa(customInput),
     };
-    console.log(formData);
     const options = {
       method: "POST",
       url: "https://judge0-ce.p.rapidapi.com/submissions",
@@ -380,8 +370,6 @@ function EditorPage() {
     } catch (error) {
       console.error("Could not get user media", error);
     }
-
-    console.log("set local stream", localVideoComponent);
   }
 
   const manageVideo = async () => {
@@ -410,14 +398,12 @@ function EditorPage() {
   };
 
   function addLocalTracks(rtcPeerConnection) {
-    console.log("Local stream", localStream);
     localStream
       .getTracks()
       .forEach((track) => rtcPeerConnection.addTrack(track, localStream));
   }
 
   function setRemoteStream(event) {
-    console.log("event stream", event.streams[0]);
     remoteVideoComponent.srcObject = event.streams[0];
     remoteStream = event.stream;
   }
@@ -455,7 +441,6 @@ function EditorPage() {
   }
 
   function sendIceCandidate(event) {
-    console.log(event.candidate);
     if (event.candidate) {
       socketRef.current.emit("webrtc_ice_candidate", {
         roomId,
@@ -553,7 +538,6 @@ function EditorPage() {
     let url = canvas.toDataURL();
     undoRedoTracker.push(url);
     track = undoRedoTracker.length - 1;
-    console.log("track", track);
     drawLine(
       current.x,
       current.y,
@@ -615,7 +599,6 @@ function EditorPage() {
   }
 
   function activeUndo(e) {
-    console.log("activate undo");
     if (track > -1) {
       track = track - 1;
     }
@@ -629,7 +612,6 @@ function EditorPage() {
   }
 
   function activeRedo(e) {
-    console.log("active Redo");
     if (track < undoRedoTracker.length - 1) {
       track++;
     }
@@ -645,7 +627,6 @@ function EditorPage() {
   function activateUndoRedo(trackObj) {
     track = trackObj.trackValue;
     undoRedoTracker = trackObj.undoRedoTracker;
-    console.log(undoRedoTracker);
     let url = undoRedoTracker[track];
 
     let img = new Image();
