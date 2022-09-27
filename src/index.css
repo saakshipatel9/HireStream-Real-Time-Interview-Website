@@ -53,6 +53,11 @@ code {
   height: 100vh;
 }
 
+.wait-container{
+  background-color: #ffffff;
+  padding: 8px;
+}
+
 .aside{
   background-color: rgb(238 242 255);
   display: flex;

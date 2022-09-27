@@ -98,6 +98,12 @@ function EditorPage() {
       //   setFUser(username);
       // });
 
+      socketRef.current.on("asking_to_join", ({ roomId, userName, email }) => {
+        let msg = `${userName} with email id:${email} wants to join the room.`;
+        setUserJoinMsg(msg);
+        setIsShow(true);
+      });
+
       //Listening for join event
       socketRef.current.on(
         ACTIONS.JOINED,
@@ -232,7 +238,12 @@ function EditorPage() {
   // }, []);
 
   const joinUser = () => {
-    socketRef.current.emit(ACTIONS.JOIN_USER, { roomId, username: fUser });
+    socketRef.current.emit("allow_user_to_join");
+    setIsShow(false);
+  };
+
+  const NotJoinUser = () => {
+    socketRef.current.emit("not_allow_user_to_join");
     setIsShow(false);
   };
 
@@ -701,7 +712,9 @@ function EditorPage() {
           <button className="btn button mt-2" onClick={joinUser}>
             Allow
           </button>
-          <button className="btn button mt-2">Dismiss</button>
+          <button className="btn button mt-2" onClick={NotJoinUser}>
+            Dismiss
+          </button>
         </Modal.Footer>
       </Modal>
     </div>

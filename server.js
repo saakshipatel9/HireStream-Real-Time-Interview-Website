@@ -75,8 +75,23 @@ function getAllConnectedClients(roomId) {
   );
 }
 
+let newJoineeSocketId;
 io.on("connection", (socket) => {
   console.log("socket connected", socket.id);
+
+  socket.on("asking_to_join", ({ roomId, userName, email, isInitiator }) => {
+    newJoineeSocketId = socket.id;
+    socket.to(roomId).emit("asking_to_join", { roomId, userName, email });
+  });
+
+  socket.on("allow_user_to_join", () => {
+    io.to(newJoineeSocketId).emit("permitted_to_join");
+  });
+
+  socket.on("not_allow_user_to_join", () => {
+    io.to(newJoineeSocketId).emit("not_permitted_to_join");
+  });
+
   socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
     userSocketMap[socket.id] = username;
     let isRoomCreator = false;

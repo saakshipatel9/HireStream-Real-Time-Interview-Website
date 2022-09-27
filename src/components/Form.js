@@ -113,10 +113,11 @@ function Form() {
           },
         });
       } else {
-        reactNavigator(`editor/${roomIdJoin}`, {
+        reactNavigator("redirecting", {
           state: {
             roomIdJoin,
             userName,
+            joinEmail,
             isInitiator: false,
           },
         });
