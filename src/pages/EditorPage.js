@@ -45,6 +45,9 @@ function EditorPage() {
   const [fUser, setFUser] = useState("");
   const [mic, setMic] = useState(false);
   const [video, setVideo] = useState(false);
+  const [isShowFs, setIsShowFs] = useState(false);
+  const [userWarningTitle, setUserWarningTitle] = useState("");
+  const [userWarningMsg, setUserWarningMsg] = useState("");
 
   const mediaConstraints = {
     audio: true,
@@ -73,6 +76,65 @@ function EditorPage() {
       { urls: "stun:stun4.l.google.com:19302" },
     ],
   };
+
+  var elem = document.documentElement;
+  function openFullscreen() {
+    // if (isShowFs) {
+    //   setIsShowFs(false);
+    // }
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+      /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  }
+
+  if (!isInitiator) {
+    elem.addEventListener("fullscreenchange", (event) => {
+      if (!elem.fullscreenElement) {
+        setUserWarningTitle("Warning!");
+        setUserWarningMsg("Please activate full screen within 20 seconds.");
+        setIsShowFs(true);
+      }
+    });
+  }
+
+  // function closeFullscreen() {
+  //   if (document.exitFullscreen) {
+  //     document.exitFullscreen();
+  //   } else if (document.webkitExitFullscreen) {
+  //     /* Safari */
+  //     document.webkitExitFullscreen();
+  //   } else if (document.msExitFullscreen) {
+  //     /* IE11 */
+  //     document.msExitFullscreen();
+  //   }
+  // }
+
+  // function is_fullscreen() {
+  //   if (!document.mozFullScreen && !document.webkitIsFullScreen) {
+  //     return false; //FullScreen is disabled
+  //   } else {
+  //     return true; //FullScreen is enabled
+  //   }
+  //   return document.fullscreen;
+  // }
+  // function check_fullscreen() {
+  //   console.log(1);
+  //   var x = is_fullscreen();
+  //   if (!x) {
+  //     reactNavigator("/");
+  //   }
+  // }
+  // setInterval("check_fullscreen()", 10000);
+
+  if (!isInitiator) {
+    openFullscreen();
+  }
 
   useEffect(() => {
     const init = async () => {
@@ -703,7 +765,7 @@ function EditorPage() {
         </div>
       </div>
 
-      <Modal show={isShow}>
+      <Modal key="user_join" show={isShow}>
         <Modal.Header>
           <h3>User join permission</h3>
         </Modal.Header>
@@ -714,6 +776,18 @@ function EditorPage() {
           </button>
           <button className="btn button mt-2" onClick={NotJoinUser}>
             Dismiss
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal key="user_warning" show={isShowFs}>
+        <Modal.Header>
+          <h3>{userWarningTitle}</h3>
+        </Modal.Header>
+        <Modal.Body>{userWarningMsg}</Modal.Body>
+        <Modal.Footer>
+          <button className="btn button mt-2" onClick={openFullscreen}>
+            Open Fullscreen
           </button>
         </Modal.Footer>
       </Modal>
