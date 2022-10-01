@@ -163,6 +163,11 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("undoRedo", { trackObj });
   });
 
+  //user warning emit
+  socket.on("user_warning_emit", ({ msg }) => {
+    socket.broadcast.emit("user_warning_emit", { msg });
+  });
+
   socket.on("disconnecting", () => {
     const rooms = [...socket.rooms];
     rooms.forEach((roomId) => {

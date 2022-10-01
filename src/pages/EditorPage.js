@@ -11,6 +11,7 @@ import { languageOptions } from "../constants/languageOptions";
 import Modal from "react-bootstrap/Modal";
 import { Tabs, Tab } from "react-bootstrap";
 import Board from "../components/Board";
+import { Toast } from "react-bootstrap";
 
 const javascriptDefault = `// some comment`;
 
@@ -48,6 +49,10 @@ function EditorPage() {
   const [isShowFs, setIsShowFs] = useState(false);
   const [userWarningTitle, setUserWarningTitle] = useState("");
   const [userWarningMsg, setUserWarningMsg] = useState("");
+  const [showToast, setToast] = useState(false);
+  const [toastHeader, setToastHeader] = useState("");
+  const [toastBody, setToastBody] = useState("");
+  const [toastColor, setToastColor] = useState("");
 
   const mediaConstraints = {
     audio: true,
@@ -79,9 +84,9 @@ function EditorPage() {
 
   var elem = document.documentElement;
   function openFullscreen() {
-    // if (isShowFs) {
-    //   setIsShowFs(false);
-    // }
+    if (isShowFs === true) {
+      setIsShowFs(false);
+    }
     if (elem.requestFullscreen) {
       elem.requestFullscreen();
     } else if (elem.webkitRequestFullscreen) {
@@ -93,15 +98,65 @@ function EditorPage() {
     }
   }
 
-  if (!isInitiator) {
-    elem.addEventListener("fullscreenchange", (event) => {
-      if (!elem.fullscreenElement) {
-        setUserWarningTitle("Warning!");
-        setUserWarningMsg("Please activate full screen within 20 seconds.");
-        setIsShowFs(true);
-      }
-    });
-  }
+  useEffect(() => {
+    if (!isInitiator) {
+      openFullscreen();
+      document.addEventListener("fullscreenchange", (event) => {
+        if (document.fullscreenElement === null) {
+          setUserWarningTitle("Warning!");
+          var sec = 20;
+          let countdown = setInterval(() => {
+            let timer = `Please activate full screen within 00:${sec} seconds.`;
+            setUserWarningMsg(timer);
+            sec--;
+            if (sec < 0) {
+              reactNavigator("/");
+              clearInterval(countdown);
+            }
+            if (document.fullscreenElement) {
+              clearInterval(countdown);
+            }
+          }, 1000);
+          setIsShowFs(true);
+          let msg = "User has exited from full screen mode.";
+          socketRef.current.emit("user_warning_emit", { msg });
+        }
+      });
+      document.addEventListener("mozfullscreenchange", (event) => {
+        if (!document.mozFullScreen) {
+          alert("please enable full screen");
+        }
+      });
+      document.addEventListener("webkitfullscreenchange", (event) => {
+        if (!document.webkitIsFullScreen) {
+          alert("please enable full screen");
+        }
+      });
+    }
+  }, []);
+
+  // if (!isInitiator) {
+  //   openFullscreen();
+  //   document.addEventListener("fullscreenchange", (event) => {
+  //     console.log(document.fullscreenElement);
+  //     if (document.fullscreenElement === null) {
+  //       alert("please enable full screen");
+  //       // setUserWarningTitle("Warning!");
+  //       // setUserWarningMsg("Please activate full screen within 20 seconds.");
+  //       // setIsShowFs(true);
+  //     }
+  //   });
+  //   document.addEventListener("mozfullscreenchange", (event) => {
+  //     if (!document.mozFullScreen) {
+  //       alert("please enable full screen");
+  //     }
+  //   });
+  //   document.addEventListener("webkitfullscreenchange", (event) => {
+  //     if (!document.webkitIsFullScreen) {
+  //       alert("please enable full screen");
+  //     }
+  //   });
+  // }
 
   // function closeFullscreen() {
   //   if (document.exitFullscreen) {
@@ -131,10 +186,6 @@ function EditorPage() {
   //   }
   // }
   // setInterval("check_fullscreen()", 10000);
-
-  if (!isInitiator) {
-    openFullscreen();
-  }
 
   useEffect(() => {
     const init = async () => {
@@ -267,6 +318,13 @@ function EditorPage() {
 
       socketRef.current.on("undoRedo", ({ trackObj }) => {
         activateUndoRedo(trackObj);
+      });
+
+      socketRef.current.on("user_warning_emit", ({ msg }) => {
+        setToastHeader("Assigned warning to user!");
+        setToastBody(msg);
+        setToastColor("#ff9966");
+        setToast(true);
       });
 
       //Listening for disconnetion event
@@ -791,6 +849,21 @@ function EditorPage() {
           </button>
         </Modal.Footer>
       </Modal>
+
+      <div className="p-2 position-absolute top-0 end-0">
+        <Toast
+          onClose={() => setToast(false)}
+          autohide
+          show={showToast}
+          delay={2200}
+          style={{ background: toastColor, color: "#ffffff" }}
+        >
+          <Toast.Header>
+            <strong className="mr-auto">{toastHeader}</strong>
+          </Toast.Header>
+          <Toast.Body>{toastBody}</Toast.Body>
+        </Toast>
+      </div>
     </div>
   );
 }

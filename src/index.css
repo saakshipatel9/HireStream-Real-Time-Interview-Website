@@ -51,6 +51,7 @@ code {
 
 .mainWrap{
   height: 100vh;
+  position: relative;
 }
 
 .wait-container{
