@@ -101,7 +101,7 @@ function EditorPage() {
   useEffect(() => {
     if (!isInitiator) {
       setUserWarningTitle("Warning!");
-      var sec = 20;
+      var sec = 10;
       let countdown = setInterval(() => {
         let timer = `Please activate full screen within 00:${sec} seconds.`;
         setUserWarningMsg(timer);
@@ -118,7 +118,7 @@ function EditorPage() {
       document.addEventListener("fullscreenchange", (event) => {
         if (document.fullscreenElement === null) {
           setUserWarningTitle("Warning!");
-          var sec = 20;
+          var sec = 10;
           let countdown = setInterval(() => {
             let timer = `Please activate full screen within 00:${sec} seconds.`;
             setUserWarningMsg(timer);
@@ -749,6 +749,7 @@ function EditorPage() {
       undoRedoTracker: undoRedoTracker,
     };
 
+    activateUndoRedo(trackObj);
     socketRef.current.emit("undoRedo", { roomId, trackObj });
   }
 
@@ -762,6 +763,7 @@ function EditorPage() {
       undoRedoTracker: undoRedoTracker,
     };
 
+    activateUndoRedo(trackObj);
     socketRef.current.emit("undoRedo", { roomId, trackObj });
   }
 

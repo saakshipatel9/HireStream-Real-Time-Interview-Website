@@ -165,7 +165,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("undoRedo", ({ roomId, trackObj }) => {
-    io.to(roomId).emit("undoRedo", { trackObj });
+    socket.broadcast.emit("undoRedo", { trackObj });
   });
 
   //user warning emit
