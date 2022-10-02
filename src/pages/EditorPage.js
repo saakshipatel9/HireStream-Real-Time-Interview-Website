@@ -100,7 +100,21 @@ function EditorPage() {
 
   useEffect(() => {
     if (!isInitiator) {
-      openFullscreen();
+      setUserWarningTitle("Warning!");
+      var sec = 20;
+      let countdown = setInterval(() => {
+        let timer = `Please activate full screen within 00:${sec} seconds.`;
+        setUserWarningMsg(timer);
+        sec--;
+        if (sec < 0) {
+          reactNavigator("/");
+          clearInterval(countdown);
+        }
+        if (document.fullscreenElement) {
+          clearInterval(countdown);
+        }
+      }, 1000);
+      setIsShowFs(true);
       document.addEventListener("fullscreenchange", (event) => {
         if (document.fullscreenElement === null) {
           setUserWarningTitle("Warning!");

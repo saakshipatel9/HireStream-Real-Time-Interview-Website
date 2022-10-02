@@ -80,8 +80,13 @@ io.on("connection", (socket) => {
   console.log("socket connected", socket.id);
 
   socket.on("asking_to_join", ({ roomId, userName, email, isInitiator }) => {
+    const clients = getAllConnectedClients(roomId);
     newJoineeSocketId = socket.id;
-    socket.to(roomId).emit("asking_to_join", { roomId, userName, email });
+    if (clients.length === 2) {
+      io.to(newJoineeSocketId).emit("room_full");
+    } else {
+      socket.to(roomId).emit("asking_to_join", { roomId, userName, email });
+    }
   });
 
   socket.on("allow_user_to_join", () => {

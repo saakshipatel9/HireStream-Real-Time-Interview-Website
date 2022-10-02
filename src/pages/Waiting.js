@@ -64,6 +64,21 @@ function Waiting() {
           });
         }, 4000);
       });
+
+      socketRef.current.on("room_full", () => {
+        setToastHeader("Can't Join!");
+        setToastBody("This room is full.");
+        setToastColor("red");
+        setToast(true);
+
+        setTimeout(() => {
+          reactNavigator("/", {
+            state: {
+              not_permitted: true,
+            },
+          });
+        }, 4000);
+      });
     };
     init();
   }, []);
