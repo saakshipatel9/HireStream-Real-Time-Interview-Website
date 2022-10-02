@@ -149,58 +149,6 @@ function EditorPage() {
     }
   }, []);
 
-  // if (!isInitiator) {
-  //   openFullscreen();
-  //   document.addEventListener("fullscreenchange", (event) => {
-  //     console.log(document.fullscreenElement);
-  //     if (document.fullscreenElement === null) {
-  //       alert("please enable full screen");
-  //       // setUserWarningTitle("Warning!");
-  //       // setUserWarningMsg("Please activate full screen within 20 seconds.");
-  //       // setIsShowFs(true);
-  //     }
-  //   });
-  //   document.addEventListener("mozfullscreenchange", (event) => {
-  //     if (!document.mozFullScreen) {
-  //       alert("please enable full screen");
-  //     }
-  //   });
-  //   document.addEventListener("webkitfullscreenchange", (event) => {
-  //     if (!document.webkitIsFullScreen) {
-  //       alert("please enable full screen");
-  //     }
-  //   });
-  // }
-
-  // function closeFullscreen() {
-  //   if (document.exitFullscreen) {
-  //     document.exitFullscreen();
-  //   } else if (document.webkitExitFullscreen) {
-  //     /* Safari */
-  //     document.webkitExitFullscreen();
-  //   } else if (document.msExitFullscreen) {
-  //     /* IE11 */
-  //     document.msExitFullscreen();
-  //   }
-  // }
-
-  // function is_fullscreen() {
-  //   if (!document.mozFullScreen && !document.webkitIsFullScreen) {
-  //     return false; //FullScreen is disabled
-  //   } else {
-  //     return true; //FullScreen is enabled
-  //   }
-  //   return document.fullscreen;
-  // }
-  // function check_fullscreen() {
-  //   console.log(1);
-  //   var x = is_fullscreen();
-  //   if (!x) {
-  //     reactNavigator("/");
-  //   }
-  // }
-  // setInterval("check_fullscreen()", 10000);
-
   useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket();
@@ -237,7 +185,10 @@ function EditorPage() {
         async ({ clients, username, socketId, isRoomCreator }) => {
           if (username !== location.state?.userName) {
             //Notify all users using toast notification
-            console.log(`${username} joined the room.`);
+            setToastHeader("User Join!");
+            setToastBody(`${username} joined the room.`);
+            setToastColor("green");
+            setToast(true);
           }
           setClients(clients);
           // setVideo(true);
@@ -258,7 +209,6 @@ function EditorPage() {
       socketRef.current.on("start_call", async ({ username, uLocalStream }) => {
         let id = `video-${username}`;
         remoteVideoComponent = document.getElementById(id);
-        console.log(remoteVideoComponent);
         if (isInitiator) {
           rtcPeerConnection = new RTCPeerConnection(iceServers);
           rtcPeerConnection.onicecandidate = sendIceCandidate;
@@ -344,7 +294,10 @@ function EditorPage() {
       //Listening for disconnetion event
       socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
         //notify user that he/she left the room
-        console.log(`${username} left the room.`);
+        setToastHeader("User Leave!");
+        setToastBody(`${username} left the room.`);
+        setToastColor("#ff9966");
+        setToast(true);
         setClients((prev) => {
           return prev.filter((client) => client.socketId !== socketId);
         });
@@ -546,7 +499,6 @@ function EditorPage() {
   function setRemoteStream(event) {
     remoteVideoComponent.srcObject = event.streams[0];
     remoteStream = event.stream;
-    console.log(remoteVideoComponent.srcObject);
   }
 
   async function createOffer(rtcPeerConnection) {
