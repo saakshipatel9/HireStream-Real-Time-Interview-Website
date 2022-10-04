@@ -76,6 +76,7 @@ function getAllConnectedClients(roomId) {
 }
 
 let newJoineeSocketId;
+let newJoineeData;
 io.on("connection", (socket) => {
   console.log("socket connected", socket.id);
 
@@ -84,17 +85,23 @@ io.on("connection", (socket) => {
     newJoineeSocketId = socket.id;
     if (clients.length === 2) {
       io.to(newJoineeSocketId).emit("room_full");
+      newJoineeSocketId = null;
     } else {
+      newJoineeData = { roomId, userName, email };
       socket.to(roomId).emit("asking_to_join", { roomId, userName, email });
     }
   });
 
   socket.on("allow_user_to_join", () => {
     io.to(newJoineeSocketId).emit("permitted_to_join");
+    newJoineeSocketId = null;
+    newJoineeData = null;
   });
 
   socket.on("not_allow_user_to_join", () => {
     io.to(newJoineeSocketId).emit("not_permitted_to_join");
+    newJoineeSocketId = null;
+    newJoineeData = null;
   });
 
   socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
@@ -114,6 +121,10 @@ io.on("connection", (socket) => {
         isRoomCreator,
       });
     });
+    if (newJoineeSocketId !== null) {
+      console.log("asking to join");
+      io.to(socket.id).emit("asking_to_join", newJoineeData);
+    }
   });
 
   socket.on(ACTIONS.CODING_LANGUAGE_CHANGE, ({ roomId, sl }) => {

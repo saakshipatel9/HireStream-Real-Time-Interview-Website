@@ -174,6 +174,7 @@ function EditorPage() {
       // });
 
       socketRef.current.on("asking_to_join", ({ roomId, userName, email }) => {
+        console.log("asking to join");
         let msg = `${userName} with email id:${email} wants to join the room.`;
         setUserJoinMsg(msg);
         setIsShow(true);
