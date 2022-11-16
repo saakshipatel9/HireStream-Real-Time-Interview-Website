@@ -146,6 +146,18 @@ function EditorPage() {
           alert("please enable full screen");
         }
       });
+
+      document.addEventListener(
+        "visibilitychange",
+        function () {
+          if (document.hasFocus()) {
+            console.log("well back");
+          } else {
+            window.close();
+          }
+        },
+        false
+      );
     }
   }, []);
 
