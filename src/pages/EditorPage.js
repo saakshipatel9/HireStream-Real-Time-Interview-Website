@@ -185,7 +185,7 @@ function EditorPage() {
       //   setFUser(username);
       // });
 
-      socketRef.current.on("asking_to_join", (userName, email) => {
+      socketRef.current.on("asking_to_join", ({ roomId, userName, email }) => {
         console.log("asking to join");
         const msg = (
           <p>
@@ -750,20 +750,6 @@ function EditorPage() {
     };
   }
 
-  function manageMic() {
-    let id = `video-${location.state?.userName}`;
-    localVideoComponent = document.getElementById(id);
-    if (mic) {
-      localVideoComponent.muted = false;
-      setMic(false);
-      console.log("Mic off");
-    } else {
-      localVideoComponent.muted = true;
-      setMic(true);
-      console.log("Mic on");
-    }
-  }
-
   return (
     <div className="mainWrap container-fluid mh-100 overflow-hidden">
       <div className="row">
@@ -816,7 +802,6 @@ function EditorPage() {
             iceServers={iceServers}
             mic={mic}
             video={video}
-            manageMic={manageMic}
             manageVideo={manageVideo}
             localStream={localStream}
             mediaConstraints={mediaConstraints}
