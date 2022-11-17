@@ -88,7 +88,7 @@ io.on("connection", (socket) => {
       newJoineeSocketId = null;
     } else {
       newJoineeData = { roomId, userName, email };
-      socket.to(roomId).emit("asking_to_join", { userName, email });
+      socket.to(roomId).emit("asking_to_join", { roomId, userName, email });
     }
   });
 
