@@ -135,9 +135,7 @@ io.on("connection", (socket) => {
   socket.on("start_call", ({ roomId, username, localStream }) => {
     console.log(`Broadcasting start_call event to peers in room ${roomId}`);
     // io.to(roomId).emit("start_call", { username });
-    socket.broadcast
-      .to(roomId)
-      .emit("start_call", { username, uLocalStream: localStream });
+    socket.broadcast.to(roomId).emit("start_call", { username });
   });
 
   socket.on("webrtc_offer", (event) => {

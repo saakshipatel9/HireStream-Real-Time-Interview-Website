@@ -211,6 +211,7 @@ function EditorPage() {
           setClients(clients);
           // setVideo(true);
           await setLocalStream(mediaConstraints);
+
           socketRef.current.emit("start_call", {
             roomId,
             username: location.state?.userName,
@@ -224,14 +225,14 @@ function EditorPage() {
         }
       );
 
-      socketRef.current.on("start_call", async ({ username, uLocalStream }) => {
+      socketRef.current.on("start_call", async ({ username }) => {
         let id = `video-${username}`;
         remoteVideoComponent = document.getElementById(id);
         if (isInitiator) {
           rtcPeerConnection = new RTCPeerConnection(iceServers);
-          rtcPeerConnection.onicecandidate = sendIceCandidate;
           addLocalTracks(rtcPeerConnection);
           rtcPeerConnection.ontrack = setRemoteStream;
+          rtcPeerConnection.onicecandidate = sendIceCandidate;
           await createOffer(rtcPeerConnection);
         }
       });
@@ -239,9 +240,9 @@ function EditorPage() {
       socketRef.current.on("webrtc_offer", async (event) => {
         if (!isInitiator) {
           rtcPeerConnection = new RTCPeerConnection(iceServers);
-          rtcPeerConnection.onicecandidate = sendIceCandidate;
           addLocalTracks(rtcPeerConnection);
           rtcPeerConnection.ontrack = setRemoteStream;
+          rtcPeerConnection.onicecandidate = sendIceCandidate;
           rtcPeerConnection.setRemoteDescription(
             new RTCSessionDescription(event)
           );
@@ -475,6 +476,7 @@ function EditorPage() {
         .then((stream) => {
           let id = `video-${location.state?.userName}`;
           localVideoComponent = document.getElementById(id);
+          // localVideoComponent.volume = 0;
           localVideoComponent.srcObject = stream;
           localStream = stream;
         });
@@ -750,6 +752,16 @@ function EditorPage() {
     };
   }
 
+  function manageMic() {
+    if (mic) {
+      localVideoComponent.muted = false;
+      setMic(false);
+    } else {
+      localVideoComponent.muted = true;
+      setMic(true);
+    }
+  }
+
   return (
     <div className="mainWrap container-fluid mh-100 overflow-hidden">
       <div className="row">
@@ -802,6 +814,7 @@ function EditorPage() {
             iceServers={iceServers}
             mic={mic}
             video={video}
+            manageMic={manageMic}
             manageVideo={manageVideo}
             localStream={localStream}
             mediaConstraints={mediaConstraints}
