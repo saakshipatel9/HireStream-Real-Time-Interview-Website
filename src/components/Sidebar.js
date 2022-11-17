@@ -34,13 +34,13 @@ function Sidebar({
     <>
       <div className="asideInner">
         <div className="video_options m-2">
-          {/* <button className="btn button" onClick={manageMic}>
+          <button className="btn button" onClick={manageMic}>
             {mic ? (
               <i className="bi bi-mic-fill"></i>
             ) : (
               <i className="bi bi-mic-mute-fill"></i>
             )}
-          </button> */}
+          </button>
           {/* <button className="btn button ms-2" onClick={manageVideo}>
             {video ? (
               <i className="bi bi-camera-video-fill"></i>
