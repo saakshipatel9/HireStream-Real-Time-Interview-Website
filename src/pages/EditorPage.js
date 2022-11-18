@@ -53,6 +53,10 @@ function EditorPage() {
   const [toastHeader, setToastHeader] = useState("");
   const [toastBody, setToastBody] = useState("");
   const [toastColor, setToastColor] = useState("");
+  console.log("username", location.state?.userName);
+  if (location.state?.userName === undefined) {
+    reactNavigator("/");
+  }
 
   const mediaConstraints = {
     audio: true,

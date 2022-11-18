@@ -36,35 +36,44 @@ function Form() {
     console.log(id);
   };
 
+  var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
   const CreateRoom = async (e) => {
     try {
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "createRoom",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            roomId: roomId,
-            roomCreator: email,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
+      if (roomId !== "" && email !== "" && email.match(mailformat)) {
+        const response = await fetch(
+          process.env.REACT_APP_BACKEND_URL + "/createRoom",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              roomId: roomId,
+              roomCreator: email,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error! status: ${response.status}`);
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(`Error! status: ${response.status}`);
+        const result = await response.json();
+
+        setToastHeader("Create Room");
+        setToastBody("Room is created!");
+        setToastColor("green");
+        setToast(true);
+
+        console.log("result is: ", result);
+      } else {
+        setToastHeader("Create Room");
+        setToastBody("Please enter your email correctly and generate an id!");
+        setToastColor("red");
+        setToast(true);
       }
-
-      const result = await response.json();
-
-      setToastHeader("Create Room");
-      setToastBody("Room is created!");
-      setToastColor("green");
-      setToast(true);
-
-      console.log("result is: ", result);
     } catch (err) {
       console.log(err.message);
     }
@@ -88,7 +97,7 @@ function Form() {
   const checkIsInitiator = async (JoinRoomId, email) => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + `checkCreator/${JoinRoomId}`,
+        process.env.REACT_APP_BACKEND_URL + `/checkCreator/${JoinRoomId}`,
         {
           method: "GET",
           headers: {
@@ -145,6 +154,14 @@ function Form() {
     if (typeof roomIdJoin !== "string" && roomIdJoin.trim().length() === 0) {
       setToastHeader("Warning!");
       setToastBody("Room ID, Email and Name is required.");
+      setToastColor("red");
+      setToast(true);
+      return;
+    }
+
+    if (!joinEmail.match(mailformat)) {
+      setToastHeader("Warning!");
+      setToastBody("Please, Enter email correctly!");
       setToastColor("red");
       setToast(true);
       return;
