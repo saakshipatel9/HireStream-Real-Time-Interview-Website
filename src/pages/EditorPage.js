@@ -53,7 +53,6 @@ function EditorPage() {
   const [toastHeader, setToastHeader] = useState("");
   const [toastBody, setToastBody] = useState("");
   const [toastColor, setToastColor] = useState("");
-  console.log("username", location.state?.userName);
   if (location.state?.userName === undefined) {
     reactNavigator("/");
   }
@@ -760,9 +759,11 @@ function EditorPage() {
     if (mic) {
       localVideoComponent.muted = false;
       setMic(false);
+      console.log("Mic off");
     } else {
       localVideoComponent.muted = true;
       setMic(true);
+      console.log("Mic on");
     }
   }
 
