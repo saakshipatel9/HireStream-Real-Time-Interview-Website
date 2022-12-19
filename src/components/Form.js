@@ -42,7 +42,7 @@ function Form() {
     try {
       if (roomId !== "" && email !== "" && email.match(mailformat)) {
         const response = await fetch(
-          process.env.REACT_APP_BACKEND_URL + "createRoom",
+          process.env.REACT_APP_BACKEND_URL + "/createRoom",
           {
             method: "POST",
             body: JSON.stringify({
@@ -97,7 +97,7 @@ function Form() {
   const checkIsInitiator = async (JoinRoomId, email) => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + `checkCreator/${JoinRoomId}`,
+        process.env.REACT_APP_BACKEND_URL + `/checkCreator/${JoinRoomId}`,
         {
           method: "GET",
           headers: {

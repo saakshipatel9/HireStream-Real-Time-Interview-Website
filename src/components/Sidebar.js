@@ -16,6 +16,7 @@ function Sidebar({
   manageVideo,
   localStream,
   mediaConstraints,
+  isInitiator,
 }) {
   if (!location.state) {
     return <Navigate to />;
@@ -33,22 +34,27 @@ function Sidebar({
   return (
     <>
       <div className="asideInner">
-        <div className="video_options m-2">
-          <button className="btn button" onClick={manageMic}>
-            {mic ? (
-              <i className="bi bi-mic-fill"></i>
-            ) : (
-              <i className="bi bi-mic-mute-fill"></i>
-            )}
-          </button>
-          {/* <button className="btn button ms-2" onClick={manageVideo}>
+        {isInitiator ? (
+          <div className="video_options m-2">
+            <button className="btn button" onClick={manageMic}>
+              {mic ? (
+                <i className="bi bi-mic-fill"></i>
+              ) : (
+                <i className="bi bi-mic-mute-fill"></i>
+              )}
+            </button>
+            {/* <button className="btn button ms-2" onClick={manageVideo}>
             {video ? (
               <i className="bi bi-camera-video-fill"></i>
             ) : (
               <i className="bi bi-camera-video-off-fill"></i>
             )}
           </button> */}
-        </div>
+          </div>
+        ) : (
+          <></>
+        )}
+
         <p style={{ fontWeight: "bold" }}>Connected</p>
         <div id="video-chat-container" className="video-position">
           {/* <video

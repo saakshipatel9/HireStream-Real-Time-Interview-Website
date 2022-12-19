@@ -823,6 +823,7 @@ function EditorPage() {
             manageVideo={manageVideo}
             localStream={localStream}
             mediaConstraints={mediaConstraints}
+            isInitiator={isInitiator}
           />
         </div>
       </div>
